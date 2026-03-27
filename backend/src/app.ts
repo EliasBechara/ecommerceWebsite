@@ -2,12 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import authRoutes from './modules/auth/auth.routes';
+import { errorMiddleware } from './middleware/errorMiddleware';
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security
+app.use(helmet());
 
+// Logging
+app.use(morgan('dev'));
+
+// CORS
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
@@ -15,7 +21,14 @@ app.use(
   }),
 );
 
-app.use(helmet());
-app.use(morgan('dev'));
+// Body parsing
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+
+// Error handling
+app.use(errorMiddleware);
 
 export default app;
