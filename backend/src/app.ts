@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import authRoutes from './modules/auth/auth.routes';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -24,6 +25,8 @@ app.use(
 // Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
