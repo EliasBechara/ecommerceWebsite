@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { register } from './auth.controller';
+import { loginController, registerController } from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { loginSchema, registerSchema } from './auth.schemas';
 import rateLimit from 'express-rate-limit';
@@ -22,9 +22,14 @@ router.post(
   '/register',
   registerLimiter,
   validate(registerSchema, 'body'),
-  register,
+  registerController,
 );
 
-router.post('/login', loginLimiter, validate(loginSchema, 'body'));
+router.post(
+  '/login',
+  loginLimiter,
+  validate(loginSchema, 'body'),
+  loginController,
+);
 
 export default router;

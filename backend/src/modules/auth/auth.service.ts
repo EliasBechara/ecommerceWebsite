@@ -5,13 +5,13 @@ import jwt from 'jsonwebtoken';
 
 const SALT_ROUNDS = 12;
 
-export interface RegisterUserResult {
+interface RegisterUserResult {
   id: string;
   email: string;
   createdAt: Date;
 }
 
-export interface RegisterInput {
+interface RegisterInput {
   email: string;
   password: string;
 }
@@ -56,12 +56,12 @@ export const registerUser = async (
   return user;
 };
 
-export interface LoginUserInput {
+interface LoginUserInput {
   email: string;
   password: string;
 }
 
-export interface LoginUserResult {
+interface LoginUserResult {
   token: string;
   id: string;
   email: string;
