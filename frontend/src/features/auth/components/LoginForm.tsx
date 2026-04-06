@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AuthCard from "./AuthCard";
 import { useLoginMutation } from "../api/authApi";
+import { handleApiError } from "../utils/handleApiError";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const loginSchema = z.object({
@@ -20,35 +21,36 @@ const LOGIN_FIELDS = [
     label: "Email",
     type: "email",
     placeholder: "you@example.com",
+    autoComplete: "email",
   },
   {
     name: "password",
     label: "Password",
     type: "password",
     placeholder: "••••••••",
+    autoComplete: "current-password",
   },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Main ────────────────────────────────────────────────────────────────
 export const LoginForm = () => {
   const navigate = useNavigate();
   const [loginUser, { isLoading }] = useLoginMutation();
-
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
+    mode: "onSubmit",
   });
 
   const handleLogin = async (values: LoginFormValues) => {
     try {
       await loginUser(values).unwrap();
-      navigate("/");
     } catch (err) {
-      const message =
-        (err as { data?: { message?: string } })?.data?.message ??
-        "Login failed. Please check your credentials.";
-
-      form.setError("root", { message });
+      handleApiError(
+        err,
+        form.setError,
+        "Login failed. Please check your credentials.",
+      );
     }
   };
 
@@ -61,7 +63,7 @@ export const LoginForm = () => {
       isLoading={isLoading}
       submitLabel="Sign in"
       footerText="Don't have an account?"
-      footerActionLabel="Register one right now!"
+      footerActionLabel="Register"
       onSubmit={handleLogin}
       onFooterAction={() => navigate("/register")}
     />

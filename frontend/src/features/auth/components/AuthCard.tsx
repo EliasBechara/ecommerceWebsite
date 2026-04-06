@@ -1,16 +1,20 @@
-import type { FieldValues, UseFormReturn, Path } from "react-hook-form";
+import { useId } from "react";
+import type { FieldValues, UseFormReturn } from "react-hook-form";
+import { AuthFieldItem } from "./AuthFieldItem";
+import { Spinner } from "../../../components/icons/Spinner";
 
 interface AuthField {
   name: string;
   label: string;
   type?: string;
   placeholder?: string;
+  autoComplete?: string;
 }
 
 interface AuthCardProps<T extends FieldValues> {
   title?: string;
   subtitle?: string;
-  fields?: AuthField[];
+  fields: AuthField[];
   submitLabel?: string;
   footerText?: string;
   footerActionLabel?: string;
@@ -21,26 +25,11 @@ interface AuthCardProps<T extends FieldValues> {
   isLoading?: boolean;
 }
 
-const DEFAULT_FIELDS: AuthField[] = [
-  {
-    name: "email",
-    label: "Email",
-    type: "email",
-    placeholder: "you@example.com",
-  },
-  {
-    name: "password",
-    label: "Password",
-    type: "password",
-    placeholder: "••••••••",
-  },
-];
-
 export default function AuthCard<T extends FieldValues>({
   title = "",
   subtitle = "",
-  fields = DEFAULT_FIELDS,
-  submitLabel = "",
+  fields,
+  submitLabel = "Submit",
   footerText = "",
   footerActionLabel = "",
   form,
@@ -50,10 +39,11 @@ export default function AuthCard<T extends FieldValues>({
   isLoading = false,
 }: AuthCardProps<T>) {
   const {
-    register,
     handleSubmit,
     formState: { errors },
   } = form;
+
+  const uid = useId();
 
   return (
     <div
@@ -64,45 +54,31 @@ export default function AuthCard<T extends FieldValues>({
         {subtitle && <p className="text-sm text-zinc-400">{subtitle}</p>}
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-        {fields.map((field) => {
-          const error = errors[field.name as Path<T>];
-          const errorMessage = error?.message as string | undefined;
-
-          return (
-            <div key={field.name} className="flex flex-col gap-1.5">
-              <label htmlFor={field.name} className="text-sm text-zinc-400">
-                {field.label}
-              </label>
-              <input
-                id={field.name}
-                type={field.type ?? "text"}
-                placeholder={field.placeholder}
-                disabled={isLoading}
-                {...register(field.name as Path<T>)}
-                className={`bg-zinc-800 border ${
-                  error ? "border-red-500" : "border-zinc-700"
-                } rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-zinc-500 transition-colors`}
-              />
-              {errorMessage && (
-                <span className="text-xs text-red-500 ml-1">
-                  {errorMessage}
-                </span>
-              )}
-            </div>
-          );
-        })}
-
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-3"
+        noValidate
+      >
+        {fields.map((field) => (
+          <AuthFieldItem
+            key={field.name}
+            field={field}
+            form={form}
+            isLoading={isLoading}
+            uid={uid}
+          />
+        ))}
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-2 bg-white text-zinc-900 font-medium py-2.5 rounded-lg hover:bg-zinc-100 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="mt-2 bg-white text-zinc-900 font-medium py-2.5 rounded-lg hover:bg-zinc-100 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
         >
+          {isLoading && <Spinner />}
           {isLoading ? "Processing..." : submitLabel}
         </button>
 
         {errors.root && (
-          <p className="text-sm text-red-500 text-center">
+          <p role="alert" className="text-sm text-red-500 text-center">
             {errors.root.message}
           </p>
         )}

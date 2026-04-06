@@ -1,5 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { setUser } from "../authSlice";
+import { baseQuery } from "./baseQuery";
 
 // ─── Response Types ───────────────────────────────────────────────────────────
 interface AuthResponse {
@@ -10,9 +11,7 @@ interface AuthResponse {
 // ─── API Definition ───────────────────────────────────────────────────────────
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api",
-  }),
+  baseQuery,
   endpoints: (builder) => ({
     // ====================== REGISTER ======================
     register: builder.mutation<
@@ -23,7 +22,7 @@ export const authApi = createApi({
       }
     >({
       query: (newUser) => ({
-        url: "/register",
+        url: "/auth/register",
         method: "POST",
         body: newUser,
       }),
@@ -51,7 +50,7 @@ export const authApi = createApi({
       }
     >({
       query: (credentials) => ({
-        url: "/login",
+        url: "/auth/login",
         method: "POST",
         body: credentials,
       }),
