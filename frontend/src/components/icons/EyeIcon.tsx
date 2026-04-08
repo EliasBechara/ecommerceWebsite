@@ -7,6 +7,7 @@ export const EyeIcon = () => {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
+      data-testid="eye-icon"
     >
       <path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12z" />
       <circle cx="12" cy="12" r="3" />
