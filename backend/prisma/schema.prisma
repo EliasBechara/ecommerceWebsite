@@ -18,3 +18,25 @@ model User {
   password String 
   createdAt DateTime @default(now())
 }
+
+model Product {
+  id          String   @id @default(uuid()) @map("_id")
+  name        String
+  slug        String   @unique
+  description String
+  price       Float
+  category    Category
+  image       String
+  stock       Int      @default(0)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Category {
+  RAM
+  SSD
+  CPU
+  GPU
+  MOTHERBOARD
+}

@@ -11,9 +11,13 @@ export const errorMiddleware = (
   next: NextFunction,
 ) => {
   const statusCode = err.statusCode || 500;
+  const isProduction = process.env.NODE_ENV === 'production';
 
   res.status(statusCode).json({
-    message: err.message || 'Server Error',
-    ...(process.env.NODE_ENV !== 'production' && { stack: err.stack }),
+    message:
+      isProduction && statusCode === 500
+        ? 'Internal Server Error'
+        : err.message,
+    ...(!isProduction && { stack: err.stack }),
   });
 };
