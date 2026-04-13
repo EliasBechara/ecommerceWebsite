@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../../middleware/asyncHandler';
 import {
-  listProductBySlug,
+  getProductBySlug,
   listProductsByCategory,
-  searchProducts,
+  findProductsByQuery,
 } from './products.service';
 
 import {
@@ -25,7 +25,7 @@ export const getProductsByCategory = asyncHandler(
 export const getSingleProduct = asyncHandler(
   async (req: Request, res: Response) => {
     const { slug } = req.params as SlugInput;
-    const product = await listProductBySlug(slug);
+    const product = await getProductBySlug(slug);
     res.status(200).json(product);
   },
 );
@@ -34,7 +34,7 @@ export const searchForProducts = asyncHandler(
   async (req: Request, res: Response) => {
     const { q } = req.query as SearchForProductsInput;
 
-    const products = await searchProducts(q || undefined);
+    const products = await findProductsByQuery(q || undefined);
 
     res.status(200).json(products);
   },

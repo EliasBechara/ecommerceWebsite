@@ -21,11 +21,11 @@ export const listProductsByCategory = async (
   return productsByCategory;
 };
 
-export const listProductBySlug = async (slug: string | undefined) => {
+export const getProductBySlug = async (slug: string | undefined) => {
   if (!slug) {
     throw new AppError('The search slug is required', 400);
   }
-  const product = prisma.product.findUnique({
+  const product = await prisma.product.findUnique({
     where: { slug },
   });
 
@@ -36,7 +36,7 @@ export const listProductBySlug = async (slug: string | undefined) => {
   return product;
 };
 
-export const searchProducts = async (query: string | undefined) => {
+export const findProductsByQuery = async (query: string | undefined) => {
   if (!query) {
     throw new AppError('Search query is required', 400);
   }
@@ -62,10 +62,6 @@ export const searchProducts = async (query: string | undefined) => {
       createdAt: 'desc',
     },
   });
-
-  if (!searchedProduct) {
-    throw new AppError('Product not found', 404);
-  }
 
   return searchedProduct;
 };
