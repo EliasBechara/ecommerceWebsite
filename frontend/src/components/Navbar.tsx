@@ -17,7 +17,7 @@ export const Navbar = () => {
 
   return (
     <>
-      <nav className="flex flex-wrap items-center justify-between w-full max-w-6xl px-6 py-4 gap-4 mt-7">
+      <nav className="flex flex-wrap items-center justify-between w-full max-w-6xl px-6 py-4 gap-4 mt-7 mb-15">
         <div className="flex items-center gap-4">
           <Button
             variant="icon"

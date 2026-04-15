@@ -1,4 +1,6 @@
+import { Link } from "react-router-dom";
 import { Button } from "./button/Button";
+import { CATEGORIES, ROUTES } from "../routes";
 
 type SidebarProps = {
   isSidebarOpen: boolean;
@@ -32,18 +34,15 @@ export const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }: SidebarProps) => {
         </div>
 
         <nav className="flex flex-col gap-6 text-black pt-10">
-          <Button variant={"sidebar"} href="#">
-            Home
+          <Button variant={"sidebar"}>Home</Button>
+          <Button variant={"sidebar"}>
+            <Link to={ROUTES.category(CATEGORIES.GPU)}>GPU</Link>
           </Button>
-          <Button variant={"sidebar"} href="#">
-            Products
+          <Button variant={"sidebar"}>
+            <Link to={ROUTES.category(CATEGORIES.CPU)}>CPU</Link>
           </Button>
-          <Button variant={"sidebar"} href="#">
-            Search
-          </Button>
-          <Button variant={"sidebar"} href="#">
-            Settings
-          </Button>
+          <Button variant={"sidebar"}>Search</Button>
+          <Button variant={"sidebar"}>Settings</Button>
         </nav>
       </aside>
     </>

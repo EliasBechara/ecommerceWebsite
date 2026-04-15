@@ -1,27 +1,37 @@
-import { ProductCardCTA } from "./ProductCardCTA";
+import { Button } from "../../../components/button/Button";
+import { formatUSD } from "../../../utils/formatCurrency";
+import type { Product } from "../productTypes";
+import { Link } from "react-router-dom";
 
-export const ProductCard = () => {
+export const ProductCard = ({ product }: { product: Product }) => {
   return (
-    <article className="p-3 sm:p-4 rounded-lg">
-      <div className="relative group">
-        <img
-          src=""
-          alt="RTX 5090 graphics card"
-          className="w-full aspect-square object-cover rounded mb-3 sm:mb-4 bg-gray-500"
-        />
-        <ProductCardCTA />
-      </div>
+    <Link to={`/products/${product.slug}`}>
+      <article className="p-3 sm:p-4 rounded-lg cursor-pointer hover:opacity-90 transition">
+        <div className="relative group">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full aspect-square object-cover rounded mb-3 sm:mb-4 bg-gray-200"
+          />
+          <Button variant={"addToCartSmall"}>ADD TO CART</Button>
+        </div>
 
-      <header className="text-center mt-1">
-        <h2 className="text-[13px] sm:text-[14px] leading-snug tracking-[1px] text-black font-medium">
-          RTX 5090
-        </h2>
-      </header>
+        <header className="text-center mt-1">
+          <h2 className="text-[13px] sm:text-[14px] leading-snug tracking-[1px] text-black font-medium uppercase">
+            {product.name}
+          </h2>
+        </header>
 
-      <p className="text-[12px] sm:text-[14px] leading-snug tracking-[1px] text-[#2c2c2b] mt-0.5 text-center">
-        <span className="sr-only">Price:</span>
-        $5,000
-      </p>
-    </article>
+        <p className="text-[12px] sm:text-[14px] leading-snug tracking-[1px] text-[#2c2c2b] mt-0.5 text-center">
+          {formatUSD(product.price)}
+        </p>
+
+        {product.stock <= 5 && product.stock > 0 && (
+          <p className="text-[10px] text-orange-600 text-center uppercase font-bold">
+            Only {product.stock} left!
+          </p>
+        )}
+      </article>
+    </Link>
   );
 };
