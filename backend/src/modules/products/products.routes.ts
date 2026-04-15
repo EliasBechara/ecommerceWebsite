@@ -31,12 +31,12 @@ router.get(
   searchForProducts,
 );
 
-router.get('/:slug', validate(slugSchema, 'params'), getSingleProduct);
-
 router.get(
   '/category/:category',
   validate(getProductsByCategorySchema, 'params'),
   getProductsByCategory,
 );
+
+router.get('/:slug', validate(slugSchema, 'params'), getSingleProduct);
 
 export default router;
