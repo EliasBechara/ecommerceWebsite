@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { Button } from "./button/Button";
-import { Sidebar } from "./Sidebar";
-import { SearchBar } from "./SearchBar";
+import { Button } from "../button/Button";
+import { NavSidebar } from "./NavSidebar";
+import { SearchBar } from "../SearchBar";
 
 export const Navbar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -40,7 +40,7 @@ export const Navbar = () => {
           <Button variant="outline">Cart: 0</Button>
         </div>
 
-        <Sidebar
+        <NavSidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />

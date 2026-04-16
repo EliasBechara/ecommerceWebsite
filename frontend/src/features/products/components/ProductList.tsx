@@ -1,14 +1,17 @@
 import type { Product } from "../productTypes";
 import { ProductCard } from "./ProductCard";
+import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
 interface ProductListProps {
   title?: string;
   products: Product[] | undefined;
+  isLoading: boolean;
 }
 
 export const ProductList = ({
   title = "Collection",
   products = [],
+  isLoading = false,
 }: ProductListProps) => {
   const displayProducts = products ?? [];
 
@@ -19,12 +22,16 @@ export const ProductList = ({
       </h1>
 
       <div className="grid w-full grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-        {displayProducts.map((item) => (
-          <ProductCard key={item.id} product={item} />
-        ))}
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))
+          : displayProducts.map((item) => (
+              <ProductCard key={item.id} product={item} />
+            ))}
       </div>
 
-      {displayProducts.length === 0 && (
+      {!isLoading && displayProducts.length === 0 && (
         <div className="py-20 text-center text-gray-400">
           No products found in this category.
         </div>

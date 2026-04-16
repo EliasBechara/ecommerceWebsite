@@ -25,12 +25,6 @@ export const ProductCard = ({ product }: { product: Product }) => {
         <p className="text-[12px] sm:text-[14px] leading-snug tracking-[1px] text-[#2c2c2b] mt-0.5 text-center">
           {formatUSD(product.price)}
         </p>
-
-        {product.stock <= 5 && product.stock > 0 && (
-          <p className="text-[10px] text-orange-600 text-center uppercase font-bold">
-            Only {product.stock} left!
-          </p>
-        )}
       </article>
     </Link>
   );

@@ -1,6 +1,6 @@
 import { useGetProductsByCategoryQuery } from "../features/products/api/productsApi";
 import { ProductList } from "../features/products/components/ProductList";
-import { PageLayout } from "../components/PageLayout";
+import { PageLayout } from "../components/layout/PageLayout";
 
 // TODO: Define Home page strategy (featured products, categories, or landing content)
 // Temporarily using "CPUS" category as placeholder

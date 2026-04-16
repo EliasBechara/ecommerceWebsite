@@ -1,7 +1,9 @@
 import { useParams } from "react-router-dom";
 import { useGetProductsByCategoryQuery } from "../api/productsApi";
 import { ProductList } from "../components/ProductList";
-import { PageLayout } from "../../../components/PageLayout";
+import { PageLayout } from "../../../components/layout/PageLayout";
+import { ErrorMessage } from "../components/ErrorMessage";
+import { getErrorMessage } from "../../../utils/getErrorMessage";
 
 export const CategoryPage = () => {
   const params = useParams<{ category: string }>();
@@ -12,15 +14,26 @@ export const CategoryPage = () => {
     data: products,
     isLoading,
     isError,
-  } = useGetProductsByCategoryQuery(categoryName);
+    error,
+  } = useGetProductsByCategoryQuery(categoryName, {
+    skip: !categoryName,
+  });
 
-  if (isLoading) return <div>Loading...</div>;
-
-  if (isError) return <div>Something Went Wrong</div>;
+  if (isError) {
+    return (
+      <PageLayout>
+        <ErrorMessage message={getErrorMessage(error)} />
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout>
-      <ProductList title={categoryName} products={products} />
+      <ProductList
+        title={categoryName}
+        products={products}
+        isLoading={isLoading}
+      />
     </PageLayout>
   );
 };

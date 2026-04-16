@@ -1,16 +1,27 @@
 import { useParams } from "react-router-dom";
 import { useGetProductBySlugQuery } from "../api/productsApi";
-import { PageLayout } from "../../../components/PageLayout";
+import { PageLayout } from "../../../components/layout/PageLayout";
 import { Button } from "../../../components/button/Button";
 import { formatUSD } from "../../../utils/formatCurrency";
+import { ProductPageSkeleton } from "../components/ProductPageSkeleton";
+import { ErrorMessage } from "../components/ErrorMessage";
 
 export const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data: product, isLoading, error } = useGetProductBySlugQuery(slug!);
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useGetProductBySlugQuery(slug!, { skip: !slug });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error || !product) return <div>Error loading product</div>;
+  if (isLoading) return <ProductPageSkeleton />;
+  if (error || !product)
+    return (
+      <PageLayout>
+        <ErrorMessage />
+      </PageLayout>
+    );
 
   return (
     <PageLayout>
