@@ -15,10 +15,6 @@ export const SearchBar = ({ isOpen, setIsOpen }: SearchBarProps) => {
     return () => window.removeEventListener("keydown", handleEsc);
   }, []);
 
-  useEffect(() => {
-    document.body.style.overflow = isOpen ? "hidden" : "";
-  }, [isOpen]);
-
   return (
     <>
       {/* Overlay */}

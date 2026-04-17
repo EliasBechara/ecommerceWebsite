@@ -5,6 +5,8 @@ import { Button } from "../../../components/button/Button";
 import { formatUSD } from "../../../utils/formatCurrency";
 import { ProductPageSkeleton } from "../components/ProductPageSkeleton";
 import { ErrorMessage } from "../components/ErrorMessage";
+import { addToCart } from "../../cart/cartSlice";
+import { useDispatch } from "react-redux";
 
 export const ProductPage = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -14,6 +16,7 @@ export const ProductPage = () => {
     isLoading,
     error,
   } = useGetProductBySlugQuery(slug!, { skip: !slug });
+  const dispatch = useDispatch();
 
   if (isLoading) return <ProductPageSkeleton />;
   if (error || !product)
@@ -36,7 +39,12 @@ export const ProductPage = () => {
           <p className="text-[12px] sm:text-[14px] leading-snug tracking-[1px] text-[#2c2c2b] mt-0.5">
             {formatUSD(product.price)}
           </p>
-          <Button variant={"addToCartBig"}>ADD TO CART</Button>
+          <Button
+            variant={"addToCartBig"}
+            onClick={() => dispatch(addToCart({ product, quantity: 1 }))}
+          >
+            ADD TO CART
+          </Button>
           <p className="mt-10 ">{product.description}</p>
         </div>
       </div>

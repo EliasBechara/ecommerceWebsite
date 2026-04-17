@@ -18,6 +18,7 @@ export const SidePanel = ({
 }: SidePanelProps) => {
   return (
     <>
+      {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
           isSidePanelOpen ? "opacity-100 visible" : "opacity-0 invisible"
@@ -25,14 +26,18 @@ export const SidePanel = ({
         onClick={() => setIsSidePanelOpen(false)}
       />
 
+      {/* Panel */}
       <aside
-        className={sidePanelStyles({
+        className={`${sidePanelStyles({
           position,
           open: isSidePanelOpen,
-        })}
+        })} flex flex-col`}
       >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-xl font-bold text-black">Menu</h2>
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold text-black">
+            {position === "left" ? "Menu" : "Cart"}
+          </h2>
 
           <Button
             onClick={() => setIsSidePanelOpen(false)}
@@ -43,7 +48,8 @@ export const SidePanel = ({
           </Button>
         </div>
 
-        {children}
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">{children}</div>
       </aside>
     </>
   );

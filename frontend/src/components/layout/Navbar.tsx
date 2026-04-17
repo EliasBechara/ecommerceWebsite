@@ -1,19 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "../button/Button";
 import { NavSidebar } from "./NavSidebar";
 import { SearchBar } from "../SearchBar";
+import { Cart } from "../../features/cart/components/Cart";
+import { useSelector } from "react-redux";
+import { selectTotalItems } from "../../features/cart/cartSlice";
+import { useUIOverlay } from "../../hooks/useUIOverlay";
 
 export const Navbar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { activePanel, open, close, isOpen } = useUIOverlay();
+
+  const totalItems = useSelector(selectTotalItems);
 
   useEffect(() => {
-    if (isSidebarOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [isSidebarOpen]);
+    document.body.style.overflow = activePanel ? "hidden" : "unset";
+  }, [activePanel]);
 
   return (
     <>
@@ -22,14 +23,14 @@ export const Navbar = () => {
           <Button
             variant="icon"
             className="md:hidden"
-            onClick={() => setIsSidebarOpen(true)}
+            onClick={() => open("sidebar")}
           >
             ☰
           </Button>
 
           <div className="hidden md:flex items-center gap-4">
-            <Button onClick={() => setIsSidebarOpen(true)}>Menu</Button>
-            <Button onClick={() => setIsSearchOpen(true)}>Search</Button>
+            <Button onClick={() => open("sidebar")}>Menu</Button>
+            <Button onClick={() => open("search")}>Search</Button>
           </div>
         </div>
 
@@ -37,16 +38,25 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-4">
           <Button>Account</Button>
-          <Button variant="outline">Cart: 0</Button>
+          <Button variant="outline" onClick={() => open("cart")}>
+            Cart: {totalItems > 9 ? "+9" : totalItems}
+          </Button>
         </div>
 
         <NavSidebar
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen}
+          isSidebarOpen={isOpen("sidebar")}
+          setIsSidebarOpen={(v) => (v ? open("sidebar") : close())}
         />
       </nav>
 
-      <SearchBar isOpen={isSearchOpen} setIsOpen={setIsSearchOpen} />
+      <SearchBar
+        isOpen={isOpen("search")}
+        setIsOpen={(v) => (v ? open("search") : close())}
+      />
+      <Cart
+        isOpen={isOpen("cart")}
+        setIsOpen={(v) => (v ? open("cart") : close())}
+      />
     </>
   );
 };
