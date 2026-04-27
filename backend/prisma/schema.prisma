@@ -24,13 +24,15 @@ model Product {
   name        String
   slug        String   @unique
   description String
-  price       Float
+  price       Int
   category    Category
   image       String
   stock       Int      @default(0)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  cartItems CartItem[]
 }
 
 enum Category {
@@ -39,4 +41,24 @@ enum Category {
   CPU
   GPU
   MOTHERBOARD
+}
+
+model Cart {
+  id        String     @id @default(uuid()) @map("_id")
+  userId    String     @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String  @id @default(uuid()) @map("_id")
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Int
+
+  @@unique([cartId, productId])
 }
