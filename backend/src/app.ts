@@ -6,6 +6,7 @@ import authRoutes from './modules/auth/auth.routes';
 import productsRoutes from './modules/products/products.routes';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
+import cartRoutes from './modules/cart/cart.routes';
 
 const app = express();
 
@@ -18,7 +19,7 @@ app.use(morgan('dev'));
 // CORS
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   }),
 );
@@ -32,6 +33,8 @@ app.use(cookieParser());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
+app.use('/api/cart', cartRoutes)
+
 
 // Error handling
 app.use(errorMiddleware);
