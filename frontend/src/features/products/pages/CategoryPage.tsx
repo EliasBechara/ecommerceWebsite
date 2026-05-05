@@ -5,10 +5,15 @@ import { PageLayout } from "../../../components/layout/PageLayout";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { getErrorMessage } from "../../../utils/getErrorMessage";
 
-export const CategoryPage = () => {
+type Props = {
+  forcedCategory?: string;
+};
+
+export const CategoryPage = ({ forcedCategory }: Props) => {
   const params = useParams<{ category: string }>();
 
-  const categoryName = params.category?.toUpperCase() || "";
+  const categoryName =
+    forcedCategory || params.category?.toUpperCase() || "";
 
   const {
     data: products,
