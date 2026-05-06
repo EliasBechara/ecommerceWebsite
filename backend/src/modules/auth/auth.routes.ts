@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { loginController, registerController } from './auth.controller';
+import { getCurrentUser, loginController, registerController } from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { loginSchema, registerSchema } from './auth.schemas';
 import rateLimit from 'express-rate-limit';
+import { protect } from '../../middleware/protect';
 
 const loginLimiter = rateLimit({
   windowMs: 60 * 5000, // 5 min
@@ -31,5 +32,7 @@ router.post(
   validate(loginSchema, 'body'),
   loginController,
 );
+
+router.get('/me', protect, getCurrentUser);
 
 export default router;
