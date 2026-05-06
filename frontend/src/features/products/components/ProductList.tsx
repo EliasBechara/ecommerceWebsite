@@ -24,15 +24,15 @@ export const ProductList = ({
       <div className="grid w-full grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))
+            <ProductCardSkeleton key={i} />
+          ))
           : displayProducts.map((item) => (
-              <ProductCard key={item.id} product={item} />
-            ))}
+            <ProductCard key={item.id} product={item} />
+          ))}
       </div>
 
       {!isLoading && displayProducts.length === 0 && (
-        <div className="py-20 text-center text-gray-400">
+        <div className="py-20 text-center text-black">
           No products found in this category.
         </div>
       )}

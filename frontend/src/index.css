@@ -3,6 +3,7 @@
 @theme {
   --color-greyOne: #dadad2;
   --color-tahiti: #3ab7bf;
+  --color-greyOneAccent: #d2d2ca;
   --color-bermuda: #78dcca;
 }
 
@@ -20,6 +21,7 @@ body,
 *::after {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
   font: 18px/145% var(--sans);
@@ -34,7 +36,8 @@ body {
 .skeleton {
   position: relative;
   overflow: hidden;
-  background-color: #e5e7eb; /* gray-200 */
+  background-color: #e5e7eb;
+  /* gray-200 */
 }
 
 .skeleton::after {
@@ -42,12 +45,10 @@ body {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(255, 255, 255, 0.5),
+      transparent);
   animation: shimmer 1.4s infinite;
 }
 

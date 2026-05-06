@@ -45,6 +45,7 @@ export const LoginForm = () => {
   const handleLogin = async (values: LoginFormValues) => {
     try {
       await loginUser(values).unwrap();
+      navigate("/");
     } catch (err) {
       handleApiError(
         err,

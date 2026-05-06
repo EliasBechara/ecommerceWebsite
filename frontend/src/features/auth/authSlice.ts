@@ -1,4 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { RootState } from "../../app/store";
 
 interface User {
   id: string;
@@ -32,3 +33,6 @@ const authSlice = createSlice({
 
 export const { setUser, logout } = authSlice.actions;
 export default authSlice.reducer;
+
+
+export const selectIsAuthenticated = (state: RootState) => state.auth.isAuthenticated;

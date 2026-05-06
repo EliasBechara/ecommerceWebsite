@@ -4,8 +4,14 @@ import { RegisterPage } from "./pages/RegisterPage";
 import { Home } from "./pages/Home";
 import { CategoryPage } from "./features/products/pages/CategoryPage";
 import { ProductPage } from "./features/products/pages/ProductPage";
+import { useGetMeQuery } from "./features/auth/api/authApi";
+import { useHydrateCart } from "./hooks/useHydrateCart";
 
 function App() {
+
+  useGetMeQuery();
+  useHydrateCart();
+
   return (
     <div className="min-h-screen">
       <BrowserRouter>

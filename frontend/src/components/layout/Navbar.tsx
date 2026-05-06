@@ -6,11 +6,15 @@ import { Cart } from "../../features/cart/components/Cart";
 import { useSelector } from "react-redux";
 import { selectTotalItems } from "../../features/cart/cartSlice";
 import { useUIOverlay } from "../../hooks/useUIOverlay";
+import { selectIsAuthenticated } from "../../features/auth/authSlice";
+import { Link } from "react-router-dom";
 
 export const Navbar = () => {
   const { activePanel, open, close, isOpen } = useUIOverlay();
 
   const totalItems = useSelector(selectTotalItems);
+
+  const isAuthenticated = useSelector(selectIsAuthenticated)
 
   useEffect(() => {
     document.body.style.overflow = activePanel ? "hidden" : "unset";
@@ -37,7 +41,7 @@ export const Navbar = () => {
         <div className="font-bold text-xl">Logo</div>
 
         <div className="flex items-center gap-4">
-          <Button>Account</Button>
+          <Button>{isAuthenticated ? 'Account' : <Link to='/login'>Log in</Link>}</Button>
           <Button variant="outline" onClick={() => open("cart")}>
             Cart: {totalItems > 9 ? "+9" : totalItems}
           </Button>

@@ -67,8 +67,22 @@ export const authApi = createApi({
           console.error("Login onQueryStarted error:", err);
         }
       },
+    }
+    ), getMe: builder.query<AuthResponse, void>({
+      query: () => ({
+        url: '/auth/me',
+        method: 'GET',
+      }),
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          dispatch(setUser({ id: data.id, email: data.email }));
+        } catch {
+          // no valid session — stay logged out, do nothing
+        }
+      },
     }),
   }),
 });
 
-export const { useRegisterMutation, useLoginMutation } = authApi;
+export const { useRegisterMutation, useLoginMutation, useGetMeQuery } = authApi;
