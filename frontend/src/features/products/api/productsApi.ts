@@ -12,8 +12,15 @@ export const productsApi = createApi({
     getProductBySlug: builder.query<Product, string>({
       query: (slug) => `/products/${slug}`,
     }),
+
+    searchProduct: builder.query<Product[], string>({  // ← was Product, now Product[]
+      query: (arg) => ({
+        url: '/products/search',
+        params: { q: arg }
+      }),
+    }),
   }),
 });
 
-export const { useGetProductsByCategoryQuery, useGetProductBySlugQuery } =
+export const { useGetProductsByCategoryQuery, useGetProductBySlugQuery, useLazySearchProductQuery } =
   productsApi;

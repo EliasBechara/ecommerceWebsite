@@ -5,7 +5,25 @@ import { addToCart } from "../../cart/cartSlice";
 import type { Product } from "../productTypes";
 import { Link } from "react-router-dom";
 import type React from "react";
-export const ProductCard = ({ product }: { product: Product }) => {
+
+type ProductCardVariant = "default" | "custom";
+
+type ProductCardProps = {
+  product: Product;
+  variant?: ProductCardVariant;
+};
+
+const variantStyles: Record<ProductCardVariant, string> = {
+  default:
+    "group p-3 sm:p-4 rounded-lg cursor-pointer hover:opacity-90 transition",
+  custom:
+    "group p-6 border border-black rounded-none bg-white hover:shadow-lg transition",
+};
+
+export const ProductCard = ({
+  product,
+  variant = "default",
+}: ProductCardProps) => {
   const dispatch = useDispatch();
 
   const handleAddItemToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -14,7 +32,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
   };
 
   return (
-    <article className="group p-3 sm:p-4 rounded-lg cursor-pointer hover:opacity-90 transition">
+    <article className={variantStyles[variant]}>
       <Link to={`/products/${product.slug}`}>
         <div className="relative">
           <img
@@ -26,7 +44,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
           <Button
             variant={"addToCartSmall"}
             className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition"
-            onClick={(e) => handleAddItemToCart(e)}
+            onClick={handleAddItemToCart}
           >
             ADD TO CART
           </Button>

@@ -41,7 +41,7 @@ export const findProductsByQuery = async (query: string | undefined) => {
     throw new AppError('Search query is required', 400);
   }
 
-  const searchedProduct = prisma.product.findMany({
+  const searchedProduct = await prisma.product.findMany({
     where: {
       OR: [
         {

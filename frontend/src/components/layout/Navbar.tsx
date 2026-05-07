@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "../button/Button";
 import { NavSidebar } from "./NavSidebar";
-import { SearchBar } from "../SearchBar";
+import { SearchBar } from "../../features/products/components/SearchBar";
 import { Cart } from "../../features/cart/components/Cart";
 import { useSelector } from "react-redux";
 import { selectTotalItems } from "../../features/cart/cartSlice";
