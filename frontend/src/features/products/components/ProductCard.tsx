@@ -1,10 +1,9 @@
-import { useDispatch } from "react-redux";
 import { Button } from "../../../components/button/Button";
 import { formatUSD } from "../../../utils/formatCurrency";
-import { addToCart } from "../../cart/cartSlice";
 import type { Product } from "../productTypes";
 import { Link } from "react-router-dom";
 import type React from "react";
+import { useCartActions } from "../../cart/hooks/useCartActions";
 
 type ProductCardVariant = "default" | "custom";
 
@@ -24,11 +23,13 @@ export const ProductCard = ({
   product,
   variant = "default",
 }: ProductCardProps) => {
-  const dispatch = useDispatch();
+
+
+  const { add } = useCartActions();
 
   const handleAddItemToCart = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    dispatch(addToCart({ product, quantity: 1 }));
+    add(product, 1)
   };
 
   return (

@@ -1,6 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Product } from "../products/productTypes";
-import type { RootState } from "../../app/store";
 
 export type CartItemType = {
   product: Product;
@@ -19,9 +18,10 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
+
     addToCart(state, action: PayloadAction<CartItemType>) {
       const exists = state.list.some(
-        (item) => item.product.id === action.payload.product.id,
+        (item) => item.product.id === action.payload.product.id
       );
 
       if (exists) return;
@@ -29,41 +29,41 @@ export const cartSlice = createSlice({
       state.list.push(action.payload);
     },
 
-
     removeFromCart(state, action: PayloadAction<string>) {
       state.list = state.list.filter(
-        (item) => item.product.id !== action.payload,
+        (item) => item.product.id !== action.payload
       );
     },
 
     updateItemQuantity(
       state,
-      action: PayloadAction<{ id: string; quantity: number }>,
+      action: PayloadAction<{ id: string; quantity: number }>
     ) {
       const item = state.list.find(
-        (item) => item.product.id === action.payload.id,
+        (item) => item.product.id === action.payload.id
       );
 
       if (item) {
         item.quantity = action.payload.quantity;
       }
     },
+
     setCart(state, action: PayloadAction<CartItemType[]>) {
       state.list = action.payload;
-    }
+    },
+
+    clearCart(state) {
+      state.list = [];
+    },
   },
 });
 
-export const { addToCart, removeFromCart, updateItemQuantity, setCart } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  removeFromCart,
+  updateItemQuantity,
+  setCart,
+  clearCart,
+} = cartSlice.actions;
 
 export default cartSlice.reducer;
-
-export const selectTotalItems = (state: RootState) =>
-  state.cart.list.reduce((total, item) => total + item.quantity, 0);
-
-export const selectTotalPrice = (state: RootState) =>
-  state.cart.list.reduce(
-    (total, item) => total + item.product.price * item.quantity,
-    0,
-  );

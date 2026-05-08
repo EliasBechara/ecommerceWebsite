@@ -1,14 +1,11 @@
 import { SidePanel } from "../../../components/sidePanel/SidePanel";
-import { useSelector, useDispatch } from "react-redux";
-import type { RootState } from "../../../app/store";
 import {
-  updateItemQuantity,
-  removeFromCart,
   type CartItemType,
-  selectTotalPrice,
 } from "../cartSlice";
 import { CartItem } from "./CartItem";
 import { formatUSD } from "../../../utils/formatCurrency";
+import { useCartActions } from "../hooks/useCartActions";
+import { useCartSummary } from "../hooks/useCartSummary";
 
 interface CartProps {
   isOpen: boolean;
@@ -16,35 +13,26 @@ interface CartProps {
 }
 
 export const Cart = ({ isOpen, setIsOpen }: CartProps) => {
-  const dispatch = useDispatch();
 
-  const cartItems = useSelector((state: RootState) => state.cart.list);
-  const totalPrice = useSelector(selectTotalPrice);
+  const { items: cartItems, totalPrice } = useCartSummary();
+
+  const { update, remove } = useCartActions();
 
   const handleIncreaseItemAmount = (item: CartItemType) => {
-    dispatch(
-      updateItemQuantity({
-        id: item.product.id,
-        quantity: item.quantity + 1,
-      }),
-    );
+    update(item.product.id, item.quantity + 1)
+
   };
 
   const handleDecreaseItemAmount = (item: CartItemType) => {
     if (item.quantity === 1) {
-      dispatch(removeFromCart(item.product.id));
+      remove(item.product.id)
     } else {
-      dispatch(
-        updateItemQuantity({
-          id: item.product.id,
-          quantity: item.quantity - 1,
-        }),
-      );
+      update(item.product.id, item.quantity - 1)
     }
   };
 
   const handleRemoveItemFromCart = (item: CartItemType) => {
-    dispatch(removeFromCart(item.product.id));
+    remove(item.product.id)
   };
 
   return (

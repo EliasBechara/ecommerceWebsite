@@ -1,11 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/query";
-
 import authReducer from "../features/auth/authSlice";
 import { authApi } from "../features/auth/api/authApi";
 import cartReducer from "../features/cart/cartSlice";
 import { productsApi } from "../features/products/api/productsApi";
-import { canPersistCart, saveCartToStorage } from "../utils/saveToLocalStorage";
+import { saveCartToStorage } from "../features/cart/utils/saveToLocalStorage";
+import { cartApi } from "../features/cart/api/cartApi";
 
 export const store = configureStore({
   reducer: {
@@ -13,17 +13,28 @@ export const store = configureStore({
     cart: cartReducer,
     [authApi.reducerPath]: authApi.reducer,
     [productsApi.reducerPath]: productsApi.reducer,
+    [cartApi.reducerPath]: cartApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware, productsApi.middleware),
+    getDefaultMiddleware().concat(
+      authApi.middleware,
+      productsApi.middleware,
+      cartApi.middleware
+    ),
+
 });
 
 store.subscribe(() => {
-  if (!canPersistCart()) return;
-
   const state = store.getState();
+
+  if (!state.auth.isHydrated) return;
+
+  if (state.auth.user) return;
+
   saveCartToStorage(state.cart.list);
 });
+
+
 
 setupListeners(store.dispatch);
 

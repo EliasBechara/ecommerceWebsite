@@ -4,15 +4,16 @@ import { NavSidebar } from "./NavSidebar";
 import { SearchBar } from "../../features/products/components/SearchBar";
 import { Cart } from "../../features/cart/components/Cart";
 import { useSelector } from "react-redux";
-import { selectTotalItems } from "../../features/cart/cartSlice";
+
 import { useUIOverlay } from "../../hooks/useUIOverlay";
 import { selectIsAuthenticated } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
+import { useCartSummary } from "../../features/cart/hooks/useCartSummary";
 
 export const Navbar = () => {
   const { activePanel, open, close, isOpen } = useUIOverlay();
 
-  const totalItems = useSelector(selectTotalItems);
+  const { totalItems } = useCartSummary();
 
   const isAuthenticated = useSelector(selectIsAuthenticated)
 

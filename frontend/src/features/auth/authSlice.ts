@@ -9,11 +9,13 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  isHydrated: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
+  isHydrated: false,
 };
 
 const authSlice = createSlice({
@@ -28,10 +30,13 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
     },
+    setHydrated: (state) => {
+      state.isHydrated = true;
+    },
   },
 });
 
-export const { setUser, logout } = authSlice.actions;
+export const { setUser, logout, setHydrated } = authSlice.actions;
 export default authSlice.reducer;
 
 
