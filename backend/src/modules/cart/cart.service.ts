@@ -1,14 +1,97 @@
 import { prisma } from "../../lib/prisma"
 import { AppError } from "../../utils/AppError";
 
-export const createCartService = async (userId: string) => {
-  const createdCart = await prisma.cart.create({
-    data: {
-      userId,
+export const getCartService = async (userId: string) => {
+  const cart = await prisma.cart.findUnique({
+    where: { userId },
+    include: {
+      items: {
+        include: { product: true },
+      },
     },
   });
 
-  return createdCart;
+  if (!cart) {
+    throw new AppError("Cart not found", 404);
+  }
+
+  return cart;
+};
+
+export type GuestCartItem = {
+  productId: string;
+  quantity: number;
+};
+
+export const mergeCartService = async (
+  userId: string,
+  guestCart: GuestCartItem[],
+) => {
+  return prisma.$transaction(async (tx) => {
+    // 1. ensure cart exists
+    let cart = await tx.cart.findUnique({
+      where: { userId },
+    });
+
+    if (!cart) {
+      cart = await tx.cart.create({
+        data: { userId },
+      });
+    }
+
+    // 2. get products
+    const productIds = guestCart.map((i) => i.productId);
+
+    const products = await tx.product.findMany({
+      where: { id: { in: productIds } },
+    });
+
+    const productMap = new Map(products.map((p) => [p.id, p]));
+
+    // 3. merge
+    for (const item of guestCart) {
+      const product = productMap.get(item.productId);
+      if (!product) continue;
+
+      const safeQuantity = Math.min(item.quantity, product.stock);
+      if (safeQuantity <= 0) continue;
+
+      await tx.cartItem.upsert({
+        where: {
+          cartId_productId: {
+            cartId: cart.id,
+            productId: item.productId,
+          },
+        },
+        update: {
+          quantity: safeQuantity,
+          price: product.price,
+        },
+        create: {
+          cartId: cart.id,
+          productId: item.productId,
+          quantity: safeQuantity,
+          price: product.price,
+        },
+      });
+    }
+
+    // 4. return full cart
+    const updatedCart = await tx.cart.findUnique({
+      where: { userId },
+      include: {
+        items: {
+          include: { product: true },
+        },
+      },
+    });
+
+    if (!updatedCart) {
+      throw new AppError("Cart not found after merge", 500);
+    }
+
+    return updatedCart;
+  });
 };
 
 // ---------------------- CART OPERATIONS -----------------------

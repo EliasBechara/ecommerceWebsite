@@ -29,7 +29,7 @@ export const loginController = asyncHandler(
 
     res.cookie('token', token, {
       httpOnly: true,
-      sameSite: 'strict',
+      sameSite: 'lax',
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 1000, // 1 hour
     });

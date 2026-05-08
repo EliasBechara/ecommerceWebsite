@@ -1,8 +1,31 @@
 import { Request, Response } from 'express';
 import { JwtPayload } from 'jsonwebtoken';
 import { asyncHandler } from "../../middleware/asyncHandler";
-import { addItemToCartService, clearCartService, removeItemFromCartService, updateCartItemQuantityService, verifyCartAndCheckoutService } from "./cart.service";
+import { addItemToCartService, clearCartService, getCartService, mergeCartService, removeItemFromCartService, updateCartItemQuantityService, verifyCartAndCheckoutService } from "./cart.service";
 
+
+
+export const getCartController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userId = (req.user as JwtPayload).id;
+
+    const cart = await getCartService(userId);
+
+    res.status(200).json({
+      items: cart.items,
+    });
+  }
+);
+
+
+export const mergeCartController = async (req: Request, res: Response) => {
+  const userId = (req.user as JwtPayload).id;
+  const { items } = req.body;
+
+  const updatedCart = await mergeCartService(userId, items);
+
+  res.status(200).json(updatedCart);
+};
 
 
 // ---------------------- CART OPERATIONS -----------------------
