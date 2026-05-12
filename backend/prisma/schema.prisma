@@ -4,8 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
- provider = "prisma-client-js"
-
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -13,12 +12,14 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  password String 
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
 
-   cart      Cart?
+  cart Cart?
+
+  checkoutSessions CheckoutSession[]
 }
 
 model Product {
@@ -31,10 +32,12 @@ model Product {
   image       String
   stock       Int      @default(0)
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   cartItems CartItem[]
+
+  checkoutItems CheckoutSessionItem[]
 }
 
 enum Category {
@@ -46,10 +49,9 @@ enum Category {
 }
 
 model Cart {
-  id        String     @id @default(uuid()) @map("_id")
-  userId    String     @unique
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id     String @id @default(uuid()) @map("_id")
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   items     CartItem[]
   createdAt DateTime   @default(now())
@@ -66,4 +68,33 @@ model CartItem {
   price     Int
 
   @@unique([cartId, productId])
+}
+
+model CheckoutSession {
+  id              String                @id @default(uuid())
+  userId          String
+  user            User                  @relation(fields: [userId], references: [id])
+  status          CheckoutStatus        @default(PENDING)
+  address         Json?
+  paymentIntentId String?
+  expiresAt       DateTime
+  items           CheckoutSessionItem[]
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+}
+
+model CheckoutSessionItem {
+  id        String          @id @default(uuid())
+  sessionId String
+  session   CheckoutSession @relation(fields: [sessionId], references: [id])
+  productId String
+  product   Product         @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Float
+}
+
+enum CheckoutStatus {
+  PENDING
+  CONFIRMED
+  EXPIRED
 }
