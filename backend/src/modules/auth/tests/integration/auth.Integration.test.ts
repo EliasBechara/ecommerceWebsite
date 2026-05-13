@@ -1,134 +1,174 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import authRouter from '../../auth.routes';
 import { prisma } from '../../../../lib/prisma';
+import { createTestApp } from '../../../../test/setup/createTestApp';
+import { cleanDatabase } from '../../../../test/setup/testDb';
+import bcrypt from 'bcryptjs';
 
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────
 // Test App Setup
-// ─────────────────────────────────────────────────────────────
-const app = express();
-app.use(express.json());
-app.use(cookieParser());
-app.use('/auth', authRouter);
+// ─────────────────────────────────────────
+const app = createTestApp(authRouter, '/auth');
 
-// ─────────────────────────────────────────────────────────────
-// Shared Fixtures & Helpers
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────
+const VALID_EMAIL = 'elias@test.com';
 const VALID_PASSWORD = 'securepassword123';
 
-async function cleanupTestUsers() {
-  await prisma.user.deleteMany({
-    where: {
-      email: {
-        contains: 'testuser',
-      },
-    },
-  });
-}
+// ─────────────────────────────────────────
+// DB Setup
+// ─────────────────────────────────────────
+beforeEach(async () => {
+  await cleanDatabase();
+});
 
-// ─────────────────────────────────────────────────────────────
-// POST /auth/register Tests
-// ─────────────────────────────────────────────────────────────
-describe('POST /auth/register (Integration)', () => {
-  beforeAll(async () => {
-    await cleanupTestUsers();
-  });
 
-  afterAll(async () => {
-    await cleanupTestUsers();
-  });
-
-  beforeEach(async () => {
-    await cleanupTestUsers();
-  });
-
-  it('creates a new user in the database and returns 201 with id and email', async () => {
-    const uniqueEmail = `register-${Date.now()}@example.com`;
-
+describe('POST /auth/register', () => {
+  it('should register a new user and return 201 with id and email', async () => {
     const res = await request(app)
       .post('/auth/register')
-      .send({ email: uniqueEmail, password: VALID_PASSWORD });
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
 
     expect(res.status).toBe(201);
     expect(res.body).toMatchObject({
       id: expect.any(String),
-      email: uniqueEmail,
+      email: VALID_EMAIL,
     });
     expect(res.body).not.toHaveProperty('password');
-
-    const createdUser = await prisma.user.findUnique({
-      where: { email: uniqueEmail },
-    });
-
-    expect(createdUser).toBeTruthy();
-    expect(createdUser?.password).not.toBe(VALID_PASSWORD);
-    expect(createdUser?.email).toBe(uniqueEmail);
   });
 
-  it('returns 409 when the email is already registered', async () => {
-    const uniqueEmail = `conflict-${Date.now()}@example.com`;
-
-    // First registration (should succeed)
+  it('should hash the password stored in the database', async () => {
     await request(app)
       .post('/auth/register')
-      .send({ email: uniqueEmail, password: VALID_PASSWORD });
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
 
-    // Second registration with same email (should fail)
+    const user = await prisma.user.findUnique({
+      where: { email: VALID_EMAIL },
+    });
+
+    expect(user).toBeTruthy();
+    expect(user?.password).not.toBe(VALID_PASSWORD);
+  });
+
+  it('should return 409 when email is already registered', async () => {
+    await request(app)
+      .post('/auth/register')
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
+
     const res = await request(app)
       .post('/auth/register')
-      .send({ email: uniqueEmail, password: VALID_PASSWORD });
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
 
     expect(res.status).toBe(409);
   });
+
+  it('should return 400 for invalid email format', async () => {
+    const res = await request(app)
+      .post('/auth/register')
+      .send({ email: 'not-an-email', password: VALID_PASSWORD });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when email is missing', async () => {
+    const res = await request(app)
+      .post('/auth/register')
+      .send({ password: VALID_PASSWORD });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when password is missing', async () => {
+    const res = await request(app)
+      .post('/auth/register')
+      .send({ email: VALID_EMAIL });
+
+    expect(res.status).toBe(400);
+  });
 });
 
-// ─────────────────────────────────────────────────────────────
-// POST /auth/login Tests
-// ─────────────────────────────────────────────────────────────
-describe('POST /auth/login (Integration)', () => {
-  let testUserEmail: string;
-  let testUserId: string;
+describe('POST /auth/login', () => {
+  beforeEach(async () => {
+    const hashedPassword = await bcrypt.hash(VALID_PASSWORD, 10);
 
-  beforeAll(async () => {
-    await cleanupTestUsers();
-
-    testUserEmail = `login-${Date.now()}@example.com`;
-
-    const registerRes = await request(app)
-      .post('/auth/register')
-      .send({ email: testUserEmail, password: VALID_PASSWORD });
-
-    testUserId = registerRes.body.id;
+    await prisma.user.create({
+      data: {
+        email: VALID_EMAIL,
+        password: hashedPassword,
+      },
+    });
   });
 
-  afterAll(async () => {
-    await cleanupTestUsers();
-  });
-
-  it('returns 200, sets an httpOnly cookie, and returns user info on valid credentials', async () => {
+  it('should return 200 with user info on valid credentials', async () => {
     const res = await request(app)
       .post('/auth/login')
-      .send({ email: testUserEmail, password: VALID_PASSWORD });
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
 
     expect(res.status).toBe(200);
     expect(res.body).toMatchObject({
-      id: testUserId,
-      email: testUserEmail,
+      id: expect.any(String),
+      email: VALID_EMAIL,
     });
-    expect(res.body).not.toHaveProperty('token');
+    expect(res.body).not.toHaveProperty('password');
+  });
+
+  it('should set an httpOnly cookie on successful login', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
 
     const cookie: string = res.headers['set-cookie']?.[0] ?? '';
+
     expect(cookie).toMatch(/token=/);
     expect(cookie).toMatch(/HttpOnly/i);
   });
 
-  it('returns 401 for invalid credentials (wrong password)', async () => {
+  it('should not return a token in the response body', async () => {
     const res = await request(app)
       .post('/auth/login')
-      .send({ email: testUserEmail, password: 'wrongpassword123' });
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
+
+    expect(res.body).not.toHaveProperty('token');
+  });
+
+  it('should return 401 for wrong password', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: 'wrongpassword' });
 
     expect(res.status).toBe(401);
   });
+
+  it('should return 401 for non-existent email', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: 'ghost@test.com', password: VALID_PASSWORD });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should return 400 when email is missing', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ password: VALID_PASSWORD });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when password is missing', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+// ─────────────────────────────────────────
+// Cleanup
+// ─────────────────────────────────────────
+afterAll(async () => {
+  await prisma.$disconnect();
 });

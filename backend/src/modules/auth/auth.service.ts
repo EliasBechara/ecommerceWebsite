@@ -16,6 +16,18 @@ interface RegisterInput {
   password: string;
 }
 
+
+interface LoginUserInput {
+  email: string;
+  password: string;
+}
+
+interface LoginUserResult {
+  token: string;
+  id: string;
+  email: string;
+}
+
 export const registerUser = async (
   input: RegisterInput,
 ): Promise<RegisterUserResult> => {
@@ -66,16 +78,6 @@ export const registerUser = async (
   return user;
 };
 
-interface LoginUserInput {
-  email: string;
-  password: string;
-}
-
-interface LoginUserResult {
-  token: string;
-  id: string;
-  email: string;
-}
 
 export const loginUser = async ({
   email,

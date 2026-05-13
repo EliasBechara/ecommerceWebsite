@@ -10,7 +10,8 @@ import {
 import { validate } from '../../middleware/validate';
 import {
     getSessionSchema,
-    updateAddressSchema,
+    updateAddressBodySchema,
+    updateAddressParamsSchema,
     calculateSummarySchema,
     confirmCheckoutSchema,
     expireSessionSchema,
@@ -43,7 +44,14 @@ router.get(
 // Update checkout shipping address
 router.patch(
     '/:sessionId/address',
-    validate(updateAddressSchema, 'body'),
+    validate(
+        updateAddressParamsSchema,
+        'params',
+    ),
+    validate(
+        updateAddressBodySchema,
+        'body',
+    ),
     updateAddress,
 );
 

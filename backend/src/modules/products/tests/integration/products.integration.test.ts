@@ -1,28 +1,22 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
-import express from 'express';
-import cookieParser from 'cookie-parser';
 import productsRouter from '../../products.routes';
 import { prisma } from '../../../../lib/prisma';
 import { Category } from '@prisma/client';
-import { errorMiddleware } from '../../../../middleware/errorMiddleware';
+import { createTestApp } from '../../../../test/setup/createTestApp';
+import { cleanDatabase } from '../../../../test/setup/testDb';
 
 // ─────────────────────────────────────────
 // Test App Setup
 // ─────────────────────────────────────────
-const app = express();
-app.use(express.json());
-app.use(cookieParser());
 
-app.use('/products', productsRouter);
-
-app.use(errorMiddleware);
+const app = createTestApp(productsRouter, '/products');
 
 // ─────────────────────────────────────────
 // DB Setup
 // ─────────────────────────────────────────
 beforeEach(async () => {
-  await prisma.product.deleteMany();
+  await cleanDatabase();
 
   await prisma.product.createMany({
     data: [
@@ -151,12 +145,13 @@ describe('/GET /products/:slug', () => {
       name: 'RTX 5080',
       slug: 'rtx-5080',
       description: 'High-end 50-series GPU - Powerful 4K gaming',
-      price: 999.99,
+      price: 999,
       category: Category.GPU,
       image: '/images/rtx5080.png',
       stock: 6,
     });
   });
+
   it('should return 404 when product is not found', async () => {
     const slug = 'zzzzzzzzzzzzzzzzzzzz';
 

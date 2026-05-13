@@ -7,7 +7,7 @@ import {
 import { Category } from '@prisma/client';
 import { prisma } from '../../../../lib/prisma';
 
-vi.mock('../../../lib/prisma', () => ({
+vi.mock('../../../../lib/prisma', () => ({
   prisma: {
     product: {
       findMany: vi.fn(),

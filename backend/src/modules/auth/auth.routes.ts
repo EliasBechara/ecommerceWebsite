@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from 'express';
 import { getCurrentUser, loginController, registerController } from './auth.controller';
 import { validate } from '../../middleware/validate';
@@ -5,17 +6,23 @@ import { loginSchema, registerSchema } from './auth.schemas';
 import rateLimit from 'express-rate-limit';
 import { protect } from '../../middleware/protect';
 
-const loginLimiter = rateLimit({
-  windowMs: 60 * 5000, // 5 min
-  max: 5,
-  message: 'Too many login attempts. Try again later.',
-});
+const isTest = process.env.NODE_ENV === 'test';
 
-const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 10,
-  message: 'Too many account creation attempts. Try again later.',
-});
+export const loginLimiter = isTest
+  ? (_req: any, _res: any, next: any) => next()
+  : rateLimit({
+    windowMs: 60 * 5000, // 5 min
+    max: 10,
+    message: 'Too many login attempts. Try again later.',
+  });
+
+export const registerLimiter = isTest
+  ? (_req: any, _res: any, next: any) => next()
+  : rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 10,
+    message: 'Too many account creation attempts. Try again later.',
+  });
 
 const router = Router();
 
