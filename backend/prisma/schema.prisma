@@ -20,6 +20,7 @@ model User {
   cart Cart?
 
   checkoutSessions CheckoutSession[]
+  orders Order[]
 }
 
 model Product {
@@ -38,6 +39,7 @@ model Product {
   cartItems CartItem[]
 
   checkoutItems CheckoutSessionItem[]
+  orderItems OrderItem[]
 }
 
 enum Category {
@@ -97,4 +99,34 @@ enum CheckoutStatus {
   PENDING
   CONFIRMED
   EXPIRED
+}
+
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  status    OrderStatus @default(PENDING)
+  total     Float
+  items     OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  unitPrice Float
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  SHIPPED
+  DELIVERED
+  CANCELLED
 }
