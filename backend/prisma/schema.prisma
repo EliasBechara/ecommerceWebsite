@@ -1,6 +1,5 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
@@ -21,6 +20,7 @@ model User {
 
   checkoutSessions CheckoutSession[]
   orders Order[]
+  payments Payment[]
 }
 
 model Product {
@@ -54,7 +54,7 @@ model Cart {
   id     String @id @default(uuid()) @map("_id")
   userId String @unique
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  
   items     CartItem[]
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
@@ -101,7 +101,6 @@ enum CheckoutStatus {
   EXPIRED
 }
 
-
 model Order {
   id        String      @id @default(uuid())
   userId    String
@@ -109,6 +108,7 @@ model Order {
   status    OrderStatus @default(PENDING)
   total     Float
   items     OrderItem[]
+  payments  Payment[]
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -129,4 +129,32 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  orderId           String
+  order             Order         @relation(fields: [orderId], references: [id])
+  userId            String
+  user              User          @relation(fields: [userId], references: [id])
+  status            PaymentStatus @default(PENDING)
+  method            PaymentMethod
+  currency          String        @default("BRL")
+  amount            Float
+  providerReference String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PIX
+  BOLETO
 }
