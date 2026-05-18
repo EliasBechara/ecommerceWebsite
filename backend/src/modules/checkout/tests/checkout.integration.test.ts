@@ -8,18 +8,18 @@ import {
     vi
 } from 'vitest';
 import request from 'supertest';
-import checkoutRouter from '../../checkout.routes';
-import { prisma } from '../../../../lib/prisma';
-import { createTestApp } from '../../../../test/setup/createTestApp';
-import { cleanDatabase } from '../../../../test/setup/testDb';
-import { createUser } from '../../../../test/setup/factories/user.factory';
+import checkoutRouter from '../checkout.routes';
+import { prisma } from '../../../lib/prisma';
+import { createTestApp } from '../../../test/setup/createTestApp';
+import { cleanDatabase } from '../../../test/setup/testDb';
+import { createUser } from '../../../test/setup/factories/user.factory';
 
 // ─────────────────────────────────────────
 // Mock Protect Middleware
 // ─────────────────────────────────────────
 const mockUser = vi.hoisted(() => ({ id: '' }));
 
-vi.mock('../../../../middleware/protect', () => ({
+vi.mock('../../../middleware/protect', () => ({
     protect: (req: any, _res: any, next: any) => {
         req.user = { id: mockUser.id };
         next();

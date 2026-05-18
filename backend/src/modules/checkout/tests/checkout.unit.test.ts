@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { prisma } from '../../../../lib/prisma';
-import { AppError } from '../../../../utils/AppError';
-import { createCheckoutSession, getCheckoutSession, updateCheckoutAddress, calculateCheckoutSummary, confirmCheckoutSession, expireCheckoutSession } from '../../checkout.service';
+import { prisma } from '../../../lib/prisma';
+import { AppError } from '../../../utils/AppError';
+import { createCheckoutSession, getCheckoutSession, updateCheckoutAddress, calculateCheckoutSummary, confirmCheckoutSession, expireCheckoutSession } from '../checkout.service';
 
 
 
-vi.mock('../../../../lib/prisma', () => ({
+vi.mock('../../../lib/prisma', () => ({
     prisma: {
         cartItem: {
             findMany: vi.fn(),

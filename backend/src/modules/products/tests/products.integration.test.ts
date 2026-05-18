@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
-import productsRouter from '../../products.routes';
-import { prisma } from '../../../../lib/prisma';
+import productsRouter from '../products.routes';
+import { prisma } from '../../../lib/prisma';
 import { Category } from '@prisma/client';
-import { createTestApp } from '../../../../test/setup/createTestApp';
-import { cleanDatabase } from '../../../../test/setup/testDb';
+import { createTestApp } from '../../../test/setup/createTestApp';
+import { cleanDatabase } from '../../../test/setup/testDb';
 
 // ─────────────────────────────────────────
 // Test App Setup

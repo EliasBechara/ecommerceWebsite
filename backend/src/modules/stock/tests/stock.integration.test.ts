@@ -7,10 +7,10 @@ import {
 } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import stockRouter from '../../stock.routes';
-import { prisma } from '../../../../lib/prisma';
+import stockRouter from '../stock.routes';
+import { prisma } from '../../../lib/prisma';
 import { Category } from '@prisma/client';
-import { errorMiddleware } from '../../../../middleware/errorMiddleware';
+import { errorMiddleware } from '../../../middleware/errorMiddleware';
 
 // ─────────────────────────────────────────
 // Test App Setup

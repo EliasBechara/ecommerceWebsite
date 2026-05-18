@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import request from 'supertest';
-import authRouter from '../../auth.routes';
-import { prisma } from '../../../../lib/prisma';
-import { createTestApp } from '../../../../test/setup/createTestApp';
-import { cleanDatabase } from '../../../../test/setup/testDb';
+import authRouter from '../auth.routes';
+import { prisma } from '../../../lib/prisma';
+import { createTestApp } from '../../../test/setup/createTestApp';
+import { cleanDatabase } from '../../../test/setup/testDb';
 import bcrypt from 'bcryptjs';
 
 // ─────────────────────────────────────────

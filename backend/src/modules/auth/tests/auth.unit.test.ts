@@ -1,20 +1,32 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loginUser, registerUser } from '../../auth.service';
+import { loginUser, registerUser } from '../auth.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '../../../lib/prisma';
 
 // ─────────────────────────────────────────────────────────────
 // Mocks Setup
 // ─────────────────────────────────────────────────────────────
-vi.mock('../../../../lib/prisma', () => ({
-  prisma: {
+vi.mock('../../../lib/prisma', () => {
+  const prismaMock = {
     user: {
       findUnique: vi.fn(),
       create: vi.fn(),
     },
-  },
-}));
+
+    cart: {
+      create: vi.fn(),
+    },
+
+    $transaction: vi.fn(async (callback) => {
+      return callback(prismaMock);
+    }),
+  };
+
+  return {
+    prisma: prismaMock,
+  };
+});
 
 vi.mock('bcryptjs', () => ({
   default: {
@@ -46,6 +58,12 @@ const mockedPrisma = prisma as unknown as {
     findUnique: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
   };
+
+  cart: {
+    create: ReturnType<typeof vi.fn>;
+  };
+
+  $transaction: ReturnType<typeof vi.fn>;
 };
 
 // ─────────────────────────────────────────────────────────────
@@ -93,6 +111,11 @@ describe('registerUser service function', () => {
 
     mockedPrisma.user.create.mockResolvedValue(fakeUser);
 
+    mockedPrisma.cart.create.mockResolvedValue({
+      id: 'cart-id',
+      userId: '123',
+    });
+
     const result = await registerUser({
       email: 'test@test.com',
       password: '12345678',
@@ -118,6 +141,11 @@ describe('registerUser service function', () => {
     };
 
     mockedPrisma.user.create.mockResolvedValue(fakeUser);
+
+    mockedPrisma.cart.create.mockResolvedValue({
+      id: 'cart-id',
+      userId: '123',
+    });
 
     const result = await registerUser({
       email: '  TEST@TeSt.CoM  ',

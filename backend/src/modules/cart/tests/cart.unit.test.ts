@@ -1,9 +1,9 @@
-import { prisma } from "../../../../lib/prisma";
+import { prisma } from "../../../lib/prisma";
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { addItemToCartService, clearCartService, removeItemFromCartService, updateCartItemQuantityService, verifyCartAndCheckoutService } from "../../cart.service";
-import { AppError } from "../../../../utils/AppError";
+import { addItemToCartService, clearCartService, removeItemFromCartService, updateCartItemQuantityService, verifyCartAndCheckoutService } from "../cart.service";
+import { AppError } from "../../../utils/AppError";
 
-vi.mock('../../../../lib/prisma', () => ({
+vi.mock('../../../lib/prisma', () => ({
     prisma: {
         product: { findUnique: vi.fn() },
         cart: { findUnique: vi.fn() },

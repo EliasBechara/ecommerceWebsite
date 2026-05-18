@@ -3,11 +3,11 @@ import {
   getProductBySlug,
   listProductsByCategory,
   findProductsByQuery,
-} from '../../products.service';
+} from '../products.service';
 import { Category } from '@prisma/client';
-import { prisma } from '../../../../lib/prisma';
+import { prisma } from '../../../lib/prisma';
 
-vi.mock('../../../../lib/prisma', () => ({
+vi.mock('../../../lib/prisma', () => ({
   prisma: {
     product: {
       findMany: vi.fn(),

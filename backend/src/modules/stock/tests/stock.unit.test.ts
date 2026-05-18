@@ -3,14 +3,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
     checkStockBySlug,
     decrementProductStock,
-} from '../../stock.service';
-import { AppError } from '../../../../utils/AppError';
-import { prisma } from '../../../../lib/prisma';
+} from '../stock.service';
+import { AppError } from '../../../utils/AppError';
+import { prisma } from '../../../lib/prisma';
 
 vi.mock('../../../lib/prisma', () => ({
     prisma: {
         product: {
             findUnique: vi.fn(),
+            updateMany: vi.fn(),
             update: vi.fn(),
         },
     },
@@ -34,11 +35,17 @@ describe('checkStockBySlug', () => {
             null,
         );
 
+        vi.mocked(prisma.product.updateMany).mockResolvedValue({
+            count: 0,
+        } as any);
+
         await expect(
             checkStockBySlug('rtx-5080', 2),
         ).rejects.toThrow(
             new AppError('Product not found', 404),
         );
+
+
     });
 
     it('should return stock validation data', async () => {
@@ -73,6 +80,10 @@ describe('checkStockBySlug', () => {
         vi.mocked(prisma.product.findUnique).mockResolvedValue({
             stock: 1,
             name: 'RTX 5080',
+        } as any);
+
+        vi.mocked(prisma.product.updateMany).mockResolvedValue({
+            count: 0,
         } as any);
 
         const result = await checkStockBySlug(
@@ -129,10 +140,8 @@ describe('decrementProductStock', () => {
             stock: 10,
         } as any);
 
-        vi.mocked(prisma.product.update).mockResolvedValue({
-            slug: 'rtx-5080',
-            name: 'RTX 5080',
-            stock: 8,
+        vi.mocked(prisma.product.updateMany).mockResolvedValue({
+            count: 1,
         } as any);
 
         const result = await decrementProductStock(
@@ -141,24 +150,20 @@ describe('decrementProductStock', () => {
         );
 
         expect(result).toEqual({
-            slug: 'rtx-5080',
-            name: 'RTX 5080',
-            stock: 8,
+            stock: 10,
         });
 
-        expect(prisma.product.update).toHaveBeenCalledWith({
+        expect(prisma.product.updateMany).toHaveBeenCalledWith({
             where: {
                 slug: 'rtx-5080',
+                stock: {
+                    gte: 2,
+                },
             },
             data: {
                 stock: {
                     decrement: 2,
                 },
-            },
-            select: {
-                slug: true,
-                name: true,
-                stock: true,
             },
         });
     });
