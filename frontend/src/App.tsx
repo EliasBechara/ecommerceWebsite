@@ -6,6 +6,7 @@ import { CategoryPage } from "./features/products/pages/CategoryPage";
 import { ProductPage } from "./features/products/pages/ProductPage";
 import { useHydrateCart } from "./features/cart/hooks/useHydrateCart";
 import { useGetMeQuery } from "./features/auth/api/authApi";
+import { CheckoutPage } from "./features/checkout/pages/CheckoutPage";
 
 function App() {
   useGetMeQuery();
@@ -20,6 +21,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/products/category/:category" element={<CategoryPage />} />
           <Route path="/products/:slug" element={<ProductPage />} />
+          <Route path="/checkout/:sessionId" element={<CheckoutPage />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../utils/AppError';
+import { createOrder } from '../order/order.service';
 import { UpdateAddressInput } from './checkout.schema';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -121,32 +122,89 @@ export const confirmCheckoutSession = async (
     sessionId: string,
     userId: string,
 ) => {
-    const session = await getActiveSession(sessionId, userId);
+    const session = await getActiveSession(
+        sessionId,
+        userId,
+    );
 
     if (!session.address) {
-        throw new AppError('Delivery address is required before confirming', 400);
+        throw new AppError(
+            'Delivery address is required before confirming',
+            400,
+        );
     }
 
-    // Decrement stock for each item atomically
+    // Revalidate stock
+    for (const item of session.items) {
+        const product = await prisma.product.findUnique({
+            where: {
+                id: item.productId,
+            },
+        });
+
+        if (!product) {
+            throw new AppError(
+                `Product "${item.product.name}" no longer exists`,
+                404,
+            );
+        }
+
+        if (product.stock < item.quantity) {
+            throw new AppError(
+                `Insufficient stock for "${product.name}"`,
+                409,
+            );
+        }
+    }
+
+    // Decrement stock
     await prisma.$transaction(
         session.items.map((item) =>
             prisma.product.update({
-                where: { id: item.productId },
-                data: { stock: { decrement: item.quantity } },
+                where: {
+                    id: item.productId,
+                },
+
+                data: {
+                    stock: {
+                        decrement: item.quantity,
+                    },
+                },
             }),
         ),
     );
 
-    const confirmed = await prisma.checkoutSession.update({
-        where: { id: sessionId },
-        data: {
-            status: 'CONFIRMED',
-            paymentIntentId: `pi_placeholder_${Date.now()}`,
-        },
-        include: { items: { include: { product: true } } },
+    // Create permanent order
+    const order = await createOrder(userId, {
+        items: session.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+        })),
     });
 
-    // Clear the cart after confirmation
+    // Confirm checkout session
+    const confirmed =
+        await prisma.checkoutSession.update({
+            where: {
+                id: sessionId,
+            },
+
+            data: {
+                status: 'CONFIRMED',
+
+                paymentIntentId: `pi_placeholder_${Date.now()}`,
+            },
+
+            include: {
+                items: {
+                    include: {
+                        product: true,
+                    },
+                },
+            },
+        });
+
+    // Clear cart
     await prisma.cartItem.deleteMany({
         where: {
             cart: {
@@ -155,7 +213,10 @@ export const confirmCheckoutSession = async (
         },
     });
 
-    return confirmed;
+    return {
+        confirmed,
+        order,
+    };
 };
 
 export const expireCheckoutSession = async (
