@@ -7,6 +7,8 @@ import { productsApi } from "../features/products/api/productsApi";
 import { saveCartToStorage } from "../features/cart/utils/saveToLocalStorage";
 import { cartApi } from "../features/cart/api/cartApi";
 import { checkoutApi } from "../features/checkout/api/checkoutApi";
+import { paymentApi } from "../features/payment/api/paymentApi";
+import { orderApi } from "../features/order/api/orderApi";
 
 export const store = configureStore({
   reducer: {
@@ -17,6 +19,8 @@ export const store = configureStore({
     [productsApi.reducerPath]: productsApi.reducer,
     [cartApi.reducerPath]: cartApi.reducer,
     [checkoutApi.reducerPath]: checkoutApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
+    [orderApi.reducerPath]: orderApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -24,7 +28,9 @@ export const store = configureStore({
       authApi.middleware,
       productsApi.middleware,
       cartApi.middleware,
-      checkoutApi.middleware
+      checkoutApi.middleware,
+      paymentApi.middleware,
+      orderApi.middleware,
     ),
 });
 

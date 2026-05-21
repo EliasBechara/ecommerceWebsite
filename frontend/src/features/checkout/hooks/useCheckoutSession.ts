@@ -7,8 +7,8 @@ export const useCheckoutSession = (sessionId: string) => {
     const { data: session, isLoading, error } = useGetSessionQuery(sessionId);
 
     useEffect(() => {
-        if (session?.status === "CONFIRMED") navigate("/order-success");
-        if (session?.status === "EXPIRED") navigate("/cart");
+        if (session?.status === "EXPIRED")
+            navigate("/cart");
     }, [session, navigate]);
 
     return { session, isLoading, error };
