@@ -2,23 +2,26 @@ import { prisma } from '../../lib/prisma';
 import { Category } from '@prisma/client';
 import { AppError } from '../../utils/AppError';
 
+type SortOption = "price_asc" | "price_desc" | "newest";
+
+const orderByMap: Record<SortOption, object> = {
+  price_asc: { price: "asc" },
+  price_desc: { price: "desc" },
+  newest: { createdAt: "desc" },
+};
+
 export const listProductsByCategory = async (
   category: Category | undefined,
+  sort: string = "newest",
 ) => {
-  if (!category) {
-    throw new AppError('Category is required', 400);
-  }
+  if (!category) throw new AppError("Category is required", 400);
 
-  const productsByCategory = prisma.product.findMany({
-    where: {
-      category,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
+  const orderBy = orderByMap[sort as SortOption] ?? { createdAt: "desc" };
+
+  return prisma.product.findMany({
+    where: { category },
+    orderBy,
   });
-
-  return productsByCategory;
 };
 
 export const getProductBySlug = async (slug: string | undefined) => {
@@ -37,26 +40,18 @@ export const getProductBySlug = async (slug: string | undefined) => {
 };
 
 export const findProductsByQuery = async (query: string | undefined) => {
-  if (!query) {
-    throw new AppError('Search query is required', 400);
-  }
+  if (!query) throw new AppError('Search query is required', 400);
+
+  const tokens = query.trim().split(/\s+/).filter(Boolean);
 
   const searchedProduct = await prisma.product.findMany({
     where: {
-      OR: [
-        {
-          name: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-        {
-          description: {
-            contains: query,
-            mode: 'insensitive',
-          },
-        },
-      ],
+      AND: tokens.map((token) => ({
+        OR: [
+          { name: { contains: token, mode: 'insensitive' } },
+          { description: { contains: token, mode: 'insensitive' } },
+        ],
+      })),
     },
     orderBy: {
       createdAt: 'desc',

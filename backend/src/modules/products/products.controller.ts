@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../../middleware/asyncHandler';
+import { Category } from '@prisma/client';
 import {
   getProductBySlug,
   listProductsByCategory,
@@ -7,20 +8,21 @@ import {
 } from './products.service';
 
 import {
-  GetProductsInput,
   SearchForProductsInput,
   SlugInput,
 } from './products.schema';
 
-export const getProductsByCategory = asyncHandler(
-  async (req: Request, res: Response) => {
-    const { category } = req.params as GetProductsInput;
 
-    const products = await listProductsByCategory(category);
 
-    res.status(200).json(products);
-  },
-);
+export const getProductsByCategory = asyncHandler(async (req, res) => {
+  const { category } = req.params;
+  const { sort } = req.query;
+  const products = await listProductsByCategory(
+    category as Category,
+    sort as string
+  );
+  res.status(200).json(products);
+});
 
 export const getSingleProduct = asyncHandler(
   async (req: Request, res: Response) => {
@@ -39,3 +41,4 @@ export const searchForProducts = asyncHandler(
     res.status(200).json(products);
   },
 );
+
