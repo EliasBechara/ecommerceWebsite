@@ -5,15 +5,15 @@ export const productsApi = createApi({
   reducerPath: "productsApi",
   baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:5000/api" }),
   endpoints: (builder) => ({
-    getProductsByCategory: builder.query<Product[], string>({
-      query: (category) => `/products/category/${category}`,
+    getProductsByCategory: builder.query<Product[], { category: string; sort: string }>({
+      query: ({ category, sort }) => `/products/category/${category}?sort=${sort}`,
     }),
 
     getProductBySlug: builder.query<Product, string>({
       query: (slug) => `/products/${slug}`,
     }),
 
-    searchProduct: builder.query<Product[], string>({  // ← was Product, now Product[]
+    searchProduct: builder.query<Product[], string>({
       query: (arg) => ({
         url: '/products/search',
         params: { q: arg }

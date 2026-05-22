@@ -16,7 +16,7 @@ export const SearchInput = ({ value, onChange, onClose }: Props) => {
                 className="w-full border p-2 rounded outline-none"
             />
             <button
-                className="p-2 hover:bg-gray-100 rounded"
+                className="p-2 hover:bg-gray-100 rounded cursor-pointer"
                 onClick={onClose}
             >
                 ✕
