@@ -34,6 +34,9 @@ export const buttonVariants = cva(
             text-[11px] sm:text-[13px] leading-4.5 tracking-[1.3px]
             py-1.75 px-1.5 text-black bg-white/50 cursor-pointer
           `,
+        profileSettings: `
+        bg-zinc-900 text-white py-2.5 rounded-lg font-medium self-end px-6 hover:bg-zinc-800 transition-colors cursor-pointer
+        `
       },
     },
     defaultVariants: {

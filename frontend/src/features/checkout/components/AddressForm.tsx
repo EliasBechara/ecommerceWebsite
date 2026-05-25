@@ -1,20 +1,12 @@
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import type { Address } from "../types";
+import { FormField } from "../../../components/FormField";
 
 interface AddressFormProps {
     register: UseFormRegister<Address>;
     errors: FieldErrors<Address>;
 }
 
-const FormField = ({
-    className,
-    ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) => (
-    <input
-        className={`border border-zinc-300 rounded-lg px-4 py-3 outline-none ${className ?? ""}`}
-        {...props}
-    />
-);
 
 export const AddressForm = ({ register, errors }: AddressFormProps) => {
     return (

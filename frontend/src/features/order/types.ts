@@ -20,6 +20,14 @@ export interface OrderItem {
         imageUrl: string;
         price: number;
     };
+
+    address: {
+        streetAddress: string;
+        houseNumber: string;
+        city: string;
+        state: string;
+        zipCode: string;
+    };
 }
 
 export interface Order {
@@ -35,6 +43,14 @@ export interface Order {
 
     createdAt: string;
     updatedAt: string;
+
+    address: {
+        streetAddress: string;
+        houseNumber: string;
+        city: string;
+        state: string;
+        zipCode: string;
+    };
 }
 
 export interface CreateOrderBody {

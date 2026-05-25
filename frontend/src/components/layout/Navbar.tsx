@@ -42,7 +42,7 @@ export const Navbar = () => {
         <div className="font-bold text-xl">Logo</div>
 
         <div className="flex items-center gap-4">
-          <Button>{isAuthenticated ? 'Account' : <Link to='/login'>Log in</Link>}</Button>
+          <Button>{isAuthenticated ? <Link to='/account'>Account</Link> : <Link to='/login'>Log in</Link>}</Button>
           <Button variant="outline" onClick={() => open("cart")}>
             Cart: {totalItems > 9 ? "+9" : totalItems}
           </Button>

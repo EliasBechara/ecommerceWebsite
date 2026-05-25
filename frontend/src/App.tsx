@@ -9,6 +9,8 @@ import { useHydrateCart } from "./features/cart/hooks/useHydrateCart";
 import { CheckoutPage } from "./features/checkout/pages/CheckoutPage";
 import { PaymentPage } from "./features/payment/pages/PaymentPage";
 import { ProtectedRoute } from "./components/routes/ProtectedRoute";
+import { AccountSettingsPage } from "./features/account/pages/AccountSettingsPage";
+import { OrderDetailsPage } from "./features/order/pages/OrderDetails";
 
 function App() {
   useHydrateCart();
@@ -26,6 +28,8 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/checkout/:sessionId" element={<CheckoutPage />} />
             <Route path="/payment/:orderId" element={<PaymentPage />} />
+            <Route path="/account" element={<AccountSettingsPage />} />
+            <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
