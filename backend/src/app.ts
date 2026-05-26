@@ -13,6 +13,7 @@ import checkoutRoutes from './modules/checkout/checkout.routes'
 import ordersRoutes from './modules/order/order.routes'
 import paymentRoutes from './modules/payment/payment.routes'
 import stockRoutes from './modules/stock/stock.routes'
+import usersRoutes from './modules/users/users.routes'
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use(cookieParser());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', usersRoutes)
 app.use('/api/products', productsRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/checkout', checkoutRoutes);

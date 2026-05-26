@@ -9,20 +9,21 @@ export const validate =
     schema: ZodSchema<T>,
     target?: K,
   ): RequestHandler =>
-  (req: Request, res: Response, next: NextFunction) => {
-    const resolved = target || 'body';
-    const data = req[resolved] as unknown;
-    const result = schema.safeParse(data);
+    (req: Request, res: Response, next: NextFunction) => {
+      const resolved = target || 'body';
+      const data = req[resolved] as unknown;
+      const result = schema.safeParse(data);
+      if (!result.success) {
+        const errorDetails = result.error.flatten().fieldErrors;
 
-    if (!result.success) {
-      return next(new AppError('Validation failed', 400));
-    }
+        return next(new AppError('Validation failed', 400, errorDetails));
+      }
 
-    if (resolved === 'query' || resolved === 'params') {
-      Object.assign(req[resolved], result.data);
-    } else {
-      req.body = result.data;
-    }
+      if (resolved === 'query' || resolved === 'params') {
+        Object.assign(req[resolved], result.data);
+      } else {
+        req.body = result.data;
+      }
 
-    next();
-  };
+      next();
+    };
