@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { PageLayout } from "../../../components/layout/PageLayout";
-import { AccountSidebar } from "../components/AccountSidebar";
-import { ProfileDetails } from "../components/ProfileDetails";
-import { UserAddresses } from "../components/UserAddresses";
-import { UserSecurityDetails } from "../components/UserSecurityDetails";
-import { UserOrderHistory } from "../components/UserOrderHistory";
+import { AccountSidebar } from "../components/sidebar/AccountSidebar";
+import { ProfileDetails } from "../components/profile/ProfileDetails";
+import { UserAddresses } from "../components/addresses/UserAddresses";
+import { UserSecurityDetails } from "../components/profile/UserSecurityDetails";
+import { UserOrderHistory } from "../components/orders/UserOrderHistory";
+
 
 export const AccountSettingsPage = () => {
     const [activeTab, setActiveTab] = useState<string>("profile");

@@ -9,6 +9,8 @@ import { cartApi } from "../features/cart/api/cartApi";
 import { checkoutApi } from "../features/checkout/api/checkoutApi";
 import { paymentApi } from "../features/payment/api/paymentApi";
 import { orderApi } from "../features/order/api/orderApi";
+import { accountApi } from "../features/account/api/accountApi";
+
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +23,7 @@ export const store = configureStore({
     [checkoutApi.reducerPath]: checkoutApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
+    [accountApi.reducerPath]: accountApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -31,6 +34,7 @@ export const store = configureStore({
       checkoutApi.middleware,
       paymentApi.middleware,
       orderApi.middleware,
+      accountApi.middleware,
     ),
 });
 

@@ -1,25 +1,62 @@
-interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-    label?: string;
-    containerClass?: string;
+import React from 'react'
+
+interface FormFieldProps
+    extends React.InputHTMLAttributes<HTMLInputElement> {
+    label?: string
+    containerClass?: string
+    error?: string
 }
 
-export const FormField = ({
-    label,
-    className,
-    containerClass,
-    ...props
-}: FormFieldProps) => (
-    <div className={`flex flex-col gap-1.5 w-full ${containerClass ?? ""}`}>
+export const FormField = React.forwardRef<
+    HTMLInputElement,
+    FormFieldProps
+>(
+    (
+        {
+            label,
+            className,
+            containerClass,
+            error,
+            ...props
+        },
+        ref,
+    ) => (
+        <div
+            className={`flex flex-col gap-1.5 w-full ${containerClass ?? ''
+                }`}
+        >
+            {label && (
+                <label className="text-sm font-medium text-zinc-700">
+                    {label}
+                </label>
+            )}
 
-        {label && (
-            <label className="text-sm font-medium text-zinc-700">
-                {label}
-            </label>
-        )}
+            <input
+                ref={ref}
+                className={`
+                    bg-greyOneAccent
+                    border
+                    rounded-lg
+                    px-4
+                    py-3
+                    outline-none
+                    transition-colors
+                    ${error
+                        ? 'border-red-500 focus:border-red-500'
+                        : 'border-zinc-300 focus:border-zinc-500'
+                    }
+                    ${className ?? ''}
+                `}
+                {...props}
+            />
 
-        <input
-            className={`bg-greyOneAccent border border-zinc-300 rounded-lg px-4 py-3 outline-none focus:border-zinc-500 transition-colors ${className ?? ""}`}
-            {...props}
-        />
-    </div>
-);
+            {error && (
+                <p className="text-sm text-red-500">
+                    {error}
+                </p>
+            )}
+        </div>
+    ),
+)
+
+FormField.displayName = 'FormField'

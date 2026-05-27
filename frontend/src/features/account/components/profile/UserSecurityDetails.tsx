@@ -1,6 +1,6 @@
-import { FormSection } from './FormSection'
-import { FormField } from '../../../components/FormField'
-import { Button } from '../../../components/button/Button'
+import { FormSection } from '../shared/FormSection'
+import { FormField } from '../../../../components/FormField'
+import { Button } from '../../../../components/button/Button'
 
 export const UserSecurityDetails = () => {
     return (

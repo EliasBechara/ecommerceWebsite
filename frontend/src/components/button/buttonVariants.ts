@@ -36,7 +36,21 @@ export const buttonVariants = cva(
           `,
         profileSettings: `
         bg-zinc-900 text-white py-2.5 rounded-lg font-medium self-end px-6 hover:bg-zinc-800 transition-colors cursor-pointer
-        `
+        `,
+        selectChip: `
+          px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors justify-center
+        `,
+        actionText: `
+  text-xs text-zinc-500
+  hover:text-zinc-800
+  transition-colors
+`,
+        dangerText: `
+  text-xs text-red-400
+  hover:text-red-600
+  transition-colors
+  disabled:opacity-50
+`
       },
     },
     defaultVariants: {
