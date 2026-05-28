@@ -43,6 +43,12 @@ export const AddressForm = ({
     isLoading,
     submitLabel,
 }: AddressFormProps) => {
+    const form =
+        useForm<CreateAddressInput>({
+            defaultValues:
+                initial ?? emptyForm(),
+        })
+
     const {
         register,
         handleSubmit,
@@ -50,10 +56,7 @@ export const AddressForm = ({
         setValue,
         control,
         formState: { errors },
-    } = useForm<CreateAddressInput>({
-        defaultValues:
-            initial ?? emptyForm(),
-    })
+    } = form
 
     const label = useWatch({
         control,
@@ -80,7 +83,7 @@ export const AddressForm = ({
             onSubmit={handleSubmit(
                 onFormSubmit,
             )}
-            className="flex flex-col gap-4 border border-zinc-200 rounded-xl p-4 bg-zinc-50"
+            className="flex flex-col gap-4 border border-zinc-700 rounded-xl p-4 bg-[#d2d2ca8c]"
         >
             <AddressLabelSelector
                 label={label}
@@ -93,8 +96,8 @@ export const AddressForm = ({
             />
 
             <AddressFormFields
-                register={register}
-                errors={errors}
+                form={form}
+                isLoading={isLoading}
             />
 
             <label className="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">

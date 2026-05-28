@@ -20,8 +20,8 @@ export const AddressCard = ({
     isDeleting,
 }: AddressCardProps) => {
     const containerClass = address.isDefault
-        ? 'border-zinc-800 bg-zinc-50'
-        : 'border-zinc-200'
+        ? 'border-zinc-800 bg-zinc-200/60'
+        : 'border-zinc-300 bg-transparent'
 
     const fullStreet = `${address.street}, ${address.number}${address.complement
         ? `, ${address.complement}`
@@ -62,20 +62,20 @@ export const AddressCard = ({
                 {address.recipientName}
             </p>
 
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-700">
                 {fullStreet}
             </p>
 
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-700">
                 {cityLine}
             </p>
 
-            <p className="text-sm text-zinc-600">
+            <p className="text-sm text-zinc-700">
                 {address.zipCode}
             </p>
 
             {address.phoneNumber && (
-                <p className="text-sm text-zinc-500 mt-1">
+                <p className="text-sm text-zinc-700 mt-1">
                     {address.phoneNumber}
                 </p>
             )}

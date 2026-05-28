@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useForm } from "react-hook-form";
-import { AuthFieldItem } from "./AuthFieldItem";
+import { ControlledFormInput } from "./ControlledFormInput";
 
 function renderAuthFieldItem(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -12,7 +12,7 @@ function renderAuthFieldItem(
   const Wrapper = () => {
     const form = useForm({ defaultValues });
     return (
-      <AuthFieldItem
+      <ControlledFormInput
         field={field}
         form={form}
         isLoading={isLoading}
@@ -37,7 +37,7 @@ function renderAuthFieldItemWithError(
     });
 
     return (
-      <AuthFieldItem
+      <ControlledFormInput
         field={field}
         form={form}
         isLoading={isLoading}

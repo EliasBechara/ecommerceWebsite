@@ -5,6 +5,12 @@ interface FormFieldProps
     label?: string
     containerClass?: string
     error?: string
+    variant?: 'accent' | 'light'
+}
+
+const bgVariants = {
+    accent: 'bg-greyOneAccent',
+    light: 'bg-[#F4F4F5]',
 }
 
 export const FormField = React.forwardRef<
@@ -17,6 +23,7 @@ export const FormField = React.forwardRef<
             className,
             containerClass,
             error,
+            variant = 'accent',
             ...props
         },
         ref,
@@ -34,7 +41,7 @@ export const FormField = React.forwardRef<
             <input
                 ref={ref}
                 className={`
-                    bg-greyOneAccent
+                    ${bgVariants[variant]} 
                     border
                     rounded-lg
                     px-4

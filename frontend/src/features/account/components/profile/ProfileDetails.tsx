@@ -1,50 +1,36 @@
-import { useForm } from 'react-hook-form'
 import {
     useGetProfileQuery,
     useUpdateProfileMutation,
-    type UpdateProfileInput,
-} from '../../api/accountApi'
-import { usePopulateProfileForm } from '../../hooks/usePopulateProfileForm'
-import { buildProfilePayload } from '../../utils/buildProfilePayload'
-import { ProfileDetailsForm } from './ProfileDetailsForm'
-import { AccountSection } from '../shared/AccountSection'
+} from '../../api/accountApi';
+import { buildProfilePayload } from '../../utils/buildProfilePayload';
+import { ProfileDetailsForm } from './ProfileDetailsForm';
+import { AccountSection } from '../shared/AccountSection';
 
 export const ProfileDetails = () => {
-    const profileQuery = useGetProfileQuery()
+    const { data: profileData, isLoading: isQueryLoading } = useGetProfileQuery();
+    const [updateProfile, updateState] = useUpdateProfileMutation();
 
-    const [updateProfile, updateState] =
-        useUpdateProfileMutation()
-
-    const form = useForm<UpdateProfileInput>()
-
-    usePopulateProfileForm(
-        profileQuery.data,
-        form.reset,
-    )
-
-    const onSubmit = async (
-        data: UpdateProfileInput,
-    ) => {
-        await updateProfile(
-            buildProfilePayload(data),
-        )
-    }
-
-    if (profileQuery.isLoading) {
+    if (isQueryLoading) {
         return (
             <AccountSection title="Profile Details">
-                <p className="text-sm text-muted-foreground">
-                    Loading profile…
-                </p>
+                <p className="text-sm text-muted-foreground">Loading profile…</p>
             </AccountSection>
-        )
+        );
     }
 
     return (
         <ProfileDetailsForm
-            form={form}
-            onSubmit={onSubmit}
+            profileData={profileData}
+            onSubmit={(data) => {
+                // Convert null to undefined so it satisfies UpdateProfileInput strict types
+                const normalizedData = {
+                    ...data,
+                    phoneNumber: data.phoneNumber === null ? undefined : data.phoneNumber,
+                };
+
+                return updateProfile(buildProfilePayload(normalizedData)).unwrap();
+            }}
             updateState={updateState}
         />
-    )
-}
+    );
+};

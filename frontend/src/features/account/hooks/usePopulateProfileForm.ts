@@ -1,26 +1,25 @@
-import { useEffect } from 'react'
-import type {
-    UseFormReset,
-} from 'react-hook-form'
-
-import type {
-    UpdateProfileInput,
-    UserProfile,
-} from '../api/accountApi'
+import type { UseFormReset } from 'react-hook-form';
+import type { UserProfile } from '../api/accountApi';
+import { useEffect, useRef } from 'react';
 
 export const usePopulateProfileForm = (
     profile: UserProfile | undefined,
-    reset: UseFormReset<UpdateProfileInput>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    reset: UseFormReset<any>,
 ) => {
+    const hasPopulated = useRef(false);
+
     useEffect(() => {
-        if (!profile) {
-            return
+        if (!profile || hasPopulated.current) {
+            return;
         }
 
         reset({
             firstName: profile.firstName ?? '',
             lastName: profile.lastName ?? '',
             phoneNumber: profile.phoneNumber ?? '',
-        })
-    }, [profile, reset])
-}
+        });
+
+        hasPopulated.current = true;
+    }, [profile, reset]);
+};

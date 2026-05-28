@@ -1,6 +1,6 @@
 import { useId } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import { AuthFieldItem } from "./AuthFieldItem";
+import { ControlledFormInput } from "./ControlledFormInput";
 import { Spinner } from "../../../components/icons/Spinner";
 
 interface AuthField {
@@ -61,7 +61,7 @@ export default function AuthCard<T extends FieldValues>({
           noValidate
         >
           {fields.map((field) => (
-            <AuthFieldItem
+            <ControlledFormInput
               key={field.name}
               field={field}
               form={form}
