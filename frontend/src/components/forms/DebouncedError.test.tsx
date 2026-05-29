@@ -11,7 +11,7 @@ vi.mock("../hooks/useDebounce", () => ({
   useDebounce: vi.fn((value: unknown) => value),
 }));
 
-import { useDebounce } from "../hooks/useDebounce";
+import { useDebounce } from "../../features/auth/hooks/useDebounce";
 const mockUseDebounce = vi.mocked(useDebounce);
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ function renderEmailForm(defaultEmail = "") {
   const api = {
     triggerValidation: (() => Promise.resolve(false)) as () => Promise<boolean>,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    setValue: (_val: string) => {},
+    setValue: (_val: string) => { },
   };
 
   function Wrapper() {

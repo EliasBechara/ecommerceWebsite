@@ -3,13 +3,12 @@ import {
     useForm,
     useWatch,
 } from 'react-hook-form'
-import { Button } from '../../../../../components/button/Button'
-import {
-    type CreateAddressInput,
-} from '../../../api/accountApi'
+import { Button } from '../../../../components/button/Button'
+
 import { AddressFormFields } from './AddressFormFields'
 import { AddressLabelSelector } from './AddressLabelSelector'
-import { handleAddressFormError } from '../../../utils/handleAddressFormError'
+import { handleAddressFormError } from '../../utils/handleAddressFormError'
+import type { CreateAddressInput } from '../../api/addressesApi'
 
 const emptyForm =
     (): CreateAddressInput => ({

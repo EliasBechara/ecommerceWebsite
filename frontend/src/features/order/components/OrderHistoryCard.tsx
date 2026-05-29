@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
-import type { Order } from '../../../order/types'
-
+import type { Order } from '../types'
 
 
 interface OrderHistoryCardProps {

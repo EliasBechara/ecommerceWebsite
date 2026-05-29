@@ -7,7 +7,7 @@ import {
     useDeleteAddressMutation,
     type UserAddress,
     type CreateAddressInput,
-} from '../api/accountApi'
+} from '../api/addressesApi'
 
 export const useUserAddresses = () => {
     const addressesQuery =

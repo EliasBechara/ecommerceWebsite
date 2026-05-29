@@ -1,7 +1,8 @@
 import { useId } from "react";
 import type { FieldValues, UseFormReturn } from "react-hook-form";
-import { ControlledFormInput } from "./ControlledFormInput";
+
 import { Spinner } from "../../../components/icons/Spinner";
+import { ControlledFormInput } from "../../../components/forms/ControlledFormInput";
 
 interface AuthField {
   name: string;

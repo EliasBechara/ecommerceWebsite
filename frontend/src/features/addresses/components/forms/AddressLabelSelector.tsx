@@ -1,4 +1,4 @@
-import { Button } from '../../../../../components/button/Button'
+import { Button } from '../../../../components/button/Button'
 
 const LABEL_OPTIONS = [
     { value: 'HOME', display: 'Home' },

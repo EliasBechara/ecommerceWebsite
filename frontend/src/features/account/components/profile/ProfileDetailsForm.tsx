@@ -7,8 +7,9 @@ import { Button } from '../../../../components/button/Button';
 import { FormSection } from '../shared/FormSection';
 import { ProfileUpdateStatus } from './ProfileUpdateStatus';
 import type { UserProfile } from '../../api/accountApi';
-import { ControlledFormInput } from '../../../auth/components/ControlledFormInput';
+
 import { usePopulateProfileForm } from '../../hooks/usePopulateProfileForm';
+import { ControlledFormInput } from '../../../../components/forms/ControlledFormInput';
 
 
 // ─── Profile Schema ────────────────────────────────────────────────────────────

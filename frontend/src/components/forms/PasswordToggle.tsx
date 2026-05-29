@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { EyeOffIcon } from "../../../components/icons/EyeOffIcon";
-import { EyeIcon } from "../../../components/icons/EyeIcon";
+import { EyeOffIcon } from "../icons/EyeOffIcon";
+import { EyeIcon } from "../icons/EyeIcon";
 
 export function PasswordToggle({
   fieldId,

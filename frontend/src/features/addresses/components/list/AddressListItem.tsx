@@ -1,8 +1,6 @@
-import {
-    type CreateAddressInput,
-    type UserAddress,
-} from '../../../api/accountApi'
 
+
+import type { UserAddress, CreateAddressInput } from '../../api/addressesApi'
 import { AddressCard } from '../card/AddressCard'
 
 import { AddressForm } from '../forms/AddressForm'

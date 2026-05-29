@@ -4,7 +4,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { FormSection } from '../shared/FormSection'
 import { Button } from '../../../../components/button/Button'
-import { ControlledFormInput } from '../../../auth/components/ControlledFormInput'
+import { ControlledFormInput } from '../../../../components/forms/ControlledFormInput'
+
 
 const securitySchema = z.object({
     currentPassword: z.string().min(1, 'Current password is required'),

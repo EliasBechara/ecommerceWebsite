@@ -1,5 +1,5 @@
-import { useGetUserOrdersQuery } from '../../../order/api/orderApi'
-import { AccountSection } from '../shared/AccountSection'
+import { useGetUserOrdersQuery } from '../api/orderApi'
+import { AccountSection } from '../../account/components/shared/AccountSection'
 import { OrderHistoryCard } from './OrderHistoryCard'
 
 export const UserOrderHistory = () => {

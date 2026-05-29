@@ -1,8 +1,4 @@
-import {
-    type CreateAddressInput,
-    type UserAddress,
-} from '../../../api/accountApi'
-
+import type { UserAddress, CreateAddressInput } from '../../api/addressesApi'
 import { AddressListItem } from './AddressListItem'
 
 interface AddressListProps {

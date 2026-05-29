@@ -1,7 +1,7 @@
-import { Button } from '../../../../../components/button/Button'
-import {
-    type UserAddress,
-} from '../../../api/accountApi'
+
+import { Button } from '../../../../components/button/Button'
+import type { UserAddress } from '../../api/addressesApi'
+
 
 interface AddressCardActionsProps {
     address: UserAddress

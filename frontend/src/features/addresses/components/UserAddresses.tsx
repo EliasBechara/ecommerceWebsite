@@ -1,6 +1,6 @@
-import { Button } from '../../../../components/button/Button'
+import { Button } from '../../../components/button/Button'
 
-import { useUserAddresses } from '../../hooks/useUserAddresses'
+import { useUserAddresses } from '../hooks/useUserAddresses'
 
 import { AddressForm } from './forms/AddressForm'
 

@@ -2,8 +2,9 @@ import { useId } from 'react'
 import type {
     UseFormReturn,
 } from 'react-hook-form'
-import { ControlledFormInput } from '../../../../auth/components/ControlledFormInput'
-import { ADDRESS_FIELDS } from './addressFieldsConfig'
+
+import { ADDRESS_FIELDS } from '../../utils/addressFieldsConfig'
+import { ControlledFormInput } from '../../../../components/forms/ControlledFormInput';
 
 interface AddressFormFieldsProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

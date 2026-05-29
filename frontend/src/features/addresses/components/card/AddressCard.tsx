@@ -1,7 +1,6 @@
-import {
-    type UserAddress,
-} from '../../../api/accountApi'
 
+
+import type { UserAddress } from '../../api/addressesApi'
 import { AddressCardActions } from './AddressCardActions'
 
 interface AddressCardProps {

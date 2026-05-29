@@ -1,6 +1,6 @@
 import { useFormState, useWatch } from "react-hook-form";
 import type { FieldValues, UseFormReturn, Path } from "react-hook-form";
-import { useDebounce } from "../hooks/useDebounce";
+import { useDebounce } from "../../features/auth/hooks/useDebounce";
 
 export interface AuthField {
   name: string;

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { PageLayout } from "../../../components/layout/PageLayout";
 import { AccountSidebar } from "../components/sidebar/AccountSidebar";
 import { ProfileDetails } from "../components/profile/ProfileDetails";
-import { UserAddresses } from "../components/addresses/UserAddresses";
+import { UserAddresses } from "../../addresses/components/UserAddresses";
 import { UserSecurityDetails } from "../components/profile/UserSecurityDetails";
-import { UserOrderHistory } from "../components/orders/UserOrderHistory";
+import { UserOrderHistory } from "../../order/components/UserOrderHistory";
 
 
 export const AccountSettingsPage = () => {

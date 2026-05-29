@@ -10,7 +10,7 @@ import { checkoutApi } from "../features/checkout/api/checkoutApi";
 import { paymentApi } from "../features/payment/api/paymentApi";
 import { orderApi } from "../features/order/api/orderApi";
 import { accountApi } from "../features/account/api/accountApi";
-
+import { addressesApi } from "../features/addresses/api/addressesApi";
 
 export const store = configureStore({
   reducer: {
@@ -24,6 +24,7 @@ export const store = configureStore({
     [paymentApi.reducerPath]: paymentApi.reducer,
     [orderApi.reducerPath]: orderApi.reducer,
     [accountApi.reducerPath]: accountApi.reducer,
+    [addressesApi.reducerPath]: addressesApi.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>
@@ -35,6 +36,7 @@ export const store = configureStore({
       paymentApi.middleware,
       orderApi.middleware,
       accountApi.middleware,
+      addressesApi.middleware,
     ),
 });
 
@@ -47,8 +49,6 @@ store.subscribe(() => {
 
   saveCartToStorage(state.cart.list);
 });
-
-
 
 setupListeners(store.dispatch);
 
