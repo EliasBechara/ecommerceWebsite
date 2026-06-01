@@ -39,3 +39,8 @@ export interface CheckoutSession {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface ConfirmCheckoutResponse {
+    confirmed: CheckoutSession;
+    order: { id: string };
+}

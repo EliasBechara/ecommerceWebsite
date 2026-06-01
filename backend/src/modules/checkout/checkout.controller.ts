@@ -37,9 +37,9 @@ export const getSession = asyncHandler(
 export const updateAddress = asyncHandler(
     async (req: Request, res: Response) => {
         const { sessionId } = req.params as Pick<UpdateAddressInput, 'sessionId'>;
-        const { address } = req.body as UpdateAddressInput;
+        const { addressId } = req.body as UpdateAddressInput;
         const userId = (req.user as JwtPayload).id;
-        const session = await updateCheckoutAddress(sessionId, userId, address);
+        const session = await updateCheckoutAddress(sessionId, userId, addressId);
         res.status(200).json(session);
     },
 );

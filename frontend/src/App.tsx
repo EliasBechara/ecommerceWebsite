@@ -11,8 +11,10 @@ import { PaymentPage } from "./features/payment/pages/PaymentPage";
 import { ProtectedRoute } from "./components/routes/ProtectedRoute";
 import { AccountSettingsPage } from "./features/account/pages/AccountSettingsPage";
 import { OrderDetailsPage } from "./features/order/pages/OrderDetails";
+import { useGetMeQuery } from "./features/auth/api/authApi";
 
 function App() {
+  useGetMeQuery();
   useHydrateCart();
 
   return (

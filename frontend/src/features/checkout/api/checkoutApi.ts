@@ -2,9 +2,9 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQuery } from "../../auth/api/baseQuery";
 
 import type {
-    Address,
     CheckoutSession,
     CheckoutSummary,
+    ConfirmCheckoutResponse,
 } from "../types";
 
 export const checkoutApi = createApi({
@@ -41,28 +41,23 @@ export const checkoutApi = createApi({
 
         updateAddress: builder.mutation<
             CheckoutSession,
-            { sessionId: string; address: Address }
+            { sessionId: string; addressId: string }
         >({
-            query: ({ sessionId, address }) => ({
+            query: ({ sessionId, addressId }) => ({
                 url: `/checkout/${sessionId}/address`,
                 method: "PATCH",
-                body: { address },
+                body: { addressId },
             }),
-
             invalidatesTags: (_r, _e, { sessionId }) => [
                 { type: "Checkout", id: sessionId },
             ],
         }),
 
-        confirmCheckout: builder.mutation<
-            CheckoutSession,
-            string
-        >({
+        confirmCheckout: builder.mutation<ConfirmCheckoutResponse, string>({
             query: (sessionId) => ({
                 url: `/checkout/${sessionId}/confirm`,
                 method: "POST",
             }),
-
             invalidatesTags: ["Checkout"],
         }),
 

@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../utils/AppError';
 import { createOrder } from '../order/order.service';
-import { UpdateAddressInput } from './checkout.schema';
+
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -80,13 +80,17 @@ export const getCheckoutSession = async (
 export const updateCheckoutAddress = async (
     sessionId: string,
     userId: string,
-    address: UpdateAddressInput['address'],
+    addressId: string,
 ) => {
     await getActiveSession(sessionId, userId);
 
+    const address = await prisma.address.findUnique({ where: { id: addressId } });
+    if (!address) throw new AppError('Address not found', 404);
+    if (address.userId !== userId) throw new AppError('Forbidden', 403);
+
     const updated = await prisma.checkoutSession.update({
         where: { id: sessionId },
-        data: { address },
+        data: { address: { connect: { id: addressId } } },
         include: { items: { include: { product: true } } },
     });
 
@@ -127,7 +131,7 @@ export const confirmCheckoutSession = async (
         userId,
     );
 
-    if (!session.address) {
+    if (!session.addressId) {
         throw new AppError(
             'Delivery address is required before confirming',
             400,

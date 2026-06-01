@@ -20,19 +20,19 @@ export const addressSchema = z.object({
     zipCode: z.string().min(3).max(20),
 });
 
-export const updateAddressBodySchema =
-    z.object({
-        address: addressSchema,
-    });
+export const updateAddressBodySchema = z.object({
+    addressId: z.string().uuid(),
+});
 
 export const updateAddressParamsSchema =
     z.object({
         sessionId: z.uuid(),
     });
 
+
 export type UpdateAddressInput = {
     sessionId: string;
-    address: z.infer<typeof addressSchema>;
+    addressId: string;
 };
 
 export const calculateSummarySchema =
