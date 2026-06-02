@@ -12,6 +12,7 @@ import { ProtectedRoute } from "./components/routes/ProtectedRoute";
 import { AccountSettingsPage } from "./features/account/pages/AccountSettingsPage";
 import { OrderDetailsPage } from "./features/order/pages/OrderDetails";
 import { useGetMeQuery } from "./features/auth/api/authApi";
+import { PaymentSuccessPage } from "./features/order/pages/OrderSucess";
 
 function App() {
   useGetMeQuery();
@@ -32,6 +33,11 @@ function App() {
             <Route path="/payment/:orderId" element={<PaymentPage />} />
             <Route path="/account" element={<AccountSettingsPage />} />
             <Route path="/orders/:orderId" element={<OrderDetailsPage />} />
+            <Route
+              path="/orders/success/:orderId"
+              element={<PaymentSuccessPage />}
+            />
+
           </Route>
         </Routes>
       </BrowserRouter>

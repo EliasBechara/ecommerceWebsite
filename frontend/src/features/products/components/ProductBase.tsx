@@ -1,4 +1,4 @@
-import { formatUSD } from "../utils/formatCurrency";
+import { formatUSD } from "../../../utils/formatCurrency";
 
 export const ProductBase = ({
   image,
