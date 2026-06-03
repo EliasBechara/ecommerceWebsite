@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { asyncHandler } from '../../middleware/asyncHandler';
-import { findUserById, loginUser, registerUser } from './auth.service';
+import { changePassword, findUserById, loginUser, registerUser } from './auth.service';
 import { AppError } from '../../utils/AppError';
 import { JwtPayload } from 'jsonwebtoken';
 
@@ -48,3 +48,13 @@ export const getCurrentUser = asyncHandler(
     res.status(200).json({ id: user.id, email: user.email });
   },
 );
+
+export const updatePasswordController = asyncHandler(async (req: Request, res: Response) => {
+  const { id } = req.user as JwtPayload;
+  const { currentPassword, newPassword, confirmNewPassword } = req.body;
+  if (!id) throw new AppError('Invalid token payload', 401);
+
+  await changePassword({ userId: id, currentPassword, newPassword, confirmNewPassword })
+
+  res.status(200).json({ message: 'Password Updated Successfully!' })
+})

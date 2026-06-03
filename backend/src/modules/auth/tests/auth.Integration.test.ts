@@ -16,6 +16,7 @@ const app = createTestApp(authRouter, '/auth');
 // ─────────────────────────────────────────
 const VALID_EMAIL = 'elias@test.com';
 const VALID_PASSWORD = 'securepassword123';
+const NEW_PASSWORD = 'newSecurePassword456';
 
 // ─────────────────────────────────────────
 // DB Setup
@@ -161,6 +162,193 @@ describe('POST /auth/login', () => {
     const res = await request(app)
       .post('/auth/login')
       .send({ email: VALID_EMAIL });
+
+    expect(res.status).toBe(400);
+  });
+});
+
+describe('PATCH /auth/update-password', () => {
+  let authCookie: string;
+
+  beforeEach(async () => {
+    const hashedPassword = await bcrypt.hash(VALID_PASSWORD, 1);
+
+    await prisma.user.create({
+      data: { email: VALID_EMAIL, password: hashedPassword },
+    });
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
+
+    authCookie = loginRes.headers['set-cookie']?.[0] ?? '';
+  });
+
+  it('should update the password and return 200 with a success message', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ message: 'Password Updated Successfully!' });
+  });
+
+  it('should store the new password as a hash in the database', async () => {
+    await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    const user = await prisma.user.findUnique({
+      where: { email: VALID_EMAIL },
+    });
+
+    expect(user).toBeTruthy();
+    expect(user?.password).not.toBe(NEW_PASSWORD);
+
+    const isHashed = await bcrypt.compare(NEW_PASSWORD, user!.password);
+    expect(isHashed).toBe(true);
+  });
+
+  it('should allow login with new password after update', async () => {
+    await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: NEW_PASSWORD });
+
+    expect(loginRes.status).toBe(200);
+  });
+
+  it('should reject login with the old password after update', async () => {
+    await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
+
+    expect(loginRes.status).toBe(401);
+  });
+
+  it('should return 401 when currentPassword is wrong', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: 'wrongPassword99',
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should return 401 when no cookie is provided', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should return 401 when cookie token is invalid', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', 'token=invalidtoken')
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should return 400 when newPassword and confirmNewPassword do not match', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: 'doesNotMatch99',
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when newPassword is too short', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: 'short',
+        confirmNewPassword: 'short',
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when currentPassword is missing', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        newPassword: NEW_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when newPassword is missing', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        confirmNewPassword: NEW_PASSWORD,
+      });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 when confirmNewPassword is missing', async () => {
+    const res = await request(app)
+      .patch('/auth/update-password')
+      .set('Cookie', authCookie)
+      .send({
+        currentPassword: VALID_PASSWORD,
+        newPassword: NEW_PASSWORD,
+      });
 
     expect(res.status).toBe(400);
   });

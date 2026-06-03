@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '../../lib/prisma';
 import { AppError } from '../../utils/AppError';
 import jwt from 'jsonwebtoken';
+import { UpdatePasswordInput } from './auth.schemas';
 
 const SALT_ROUNDS = 12;
 
@@ -117,4 +118,39 @@ export const findUserById = async (
   if (!user) throw new AppError('User not found', 404);
 
   return user;
+};
+
+
+interface ChangePasswordInput extends UpdatePasswordInput {
+  userId: string;
+}
+
+export const changePassword = async ({
+  userId,
+  currentPassword,
+  newPassword,
+}: ChangePasswordInput) => {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { password: true },
+  });
+
+  if (!user) {
+    throw new AppError('Invalid credentials', 401);
+  }
+
+  const isValid = await bcrypt.compare(currentPassword, user.password);
+
+  if (!isValid) {
+    throw new AppError('Invalid credentials', 401);
+  }
+
+  const hashedUpdatedPassword = await bcrypt.hash(newPassword, SALT_ROUNDS);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedUpdatedPassword },
+  });
+
+  return { success: true };
 };

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loginUser, registerUser } from '../auth.service';
+import { changePassword, loginUser, registerUser } from '../auth.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../../../lib/prisma';
@@ -12,6 +12,7 @@ vi.mock('../../../lib/prisma', () => {
     user: {
       findUnique: vi.fn(),
       create: vi.fn(),
+      update: vi.fn(),
     },
 
     cart: {
@@ -57,6 +58,7 @@ const mockedPrisma = prisma as unknown as {
   user: {
     findUnique: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
   };
 
   cart: {
@@ -248,5 +250,122 @@ describe('loginUser service function', () => {
     expect(mockedJwt.sign).toHaveBeenCalledWith({ id: '1' }, 'testsecret', {
       expiresIn: '1h',
     });
+  });
+});
+
+
+describe('changePassword service function', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockedBcrypt.hash.mockResolvedValue('newHashedPassword');
+    mockedBcrypt.compare.mockResolvedValue(true);
+  });
+
+  it('should throw 401 if user is not found', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue(null);
+
+    await expect(
+      changePassword({
+        userId: 'non-existent-id',
+        currentPassword: 'oldPassword1',
+        newPassword: 'newPassword1',
+        confirmNewPassword: 'newPassword1',
+      }),
+    ).rejects.toThrow('Invalid credentials');
+  });
+
+  it('should throw 401 if current password is incorrect', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue({
+      password: 'hashedOldPassword',
+    });
+
+    mockedBcrypt.compare.mockResolvedValue(false);
+
+    await expect(
+      changePassword({
+        userId: 'user-123',
+        currentPassword: 'wrongPassword',
+        newPassword: 'newPassword1',
+        confirmNewPassword: 'newPassword1',
+      }),
+    ).rejects.toThrow('Invalid credentials');
+  });
+
+  it('should hash the new password with the correct salt rounds', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue({
+      password: 'hashedOldPassword',
+    });
+
+    mockedPrisma.user.update.mockResolvedValue({});
+
+    await changePassword({
+      userId: 'user-123',
+      currentPassword: 'oldPassword1',
+      newPassword: 'newPassword1',
+      confirmNewPassword: 'newPassword1',
+    });
+
+    expect(mockedBcrypt.hash).toHaveBeenCalledWith('newPassword1', expect.any(Number));
+  });
+
+  it('should update the user password in the database', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue({
+      password: 'hashedOldPassword',
+    });
+
+    mockedPrisma.user.update.mockResolvedValue({});
+
+    await changePassword({
+      userId: 'user-123',
+      currentPassword: 'oldPassword1',
+      newPassword: 'newPassword1',
+      confirmNewPassword: 'newPassword1',
+    });
+
+    expect(mockedPrisma.user.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'user-123' },
+        data: { password: 'newHashedPassword' },
+      }),
+    );
+  });
+
+  it('should return { success: true } on a successful password change', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue({
+      password: 'hashedOldPassword',
+    });
+
+    mockedPrisma.user.update.mockResolvedValue({});
+
+    const result = await changePassword({
+      userId: 'user-123',
+      currentPassword: 'oldPassword1',
+      newPassword: 'newPassword1',
+      confirmNewPassword: 'newPassword1',
+    });
+
+    expect(result).toEqual({ success: true });
+  });
+
+  it('should only select the password field when fetching the user', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue({
+      password: 'hashedOldPassword',
+    });
+
+    mockedPrisma.user.update.mockResolvedValue({});
+
+    await changePassword({
+      userId: 'user-123',
+      currentPassword: 'oldPassword1',
+      newPassword: 'newPassword1',
+      confirmNewPassword: 'newPassword1',
+    });
+
+    expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'user-123' },
+        select: { password: true },
+      }),
+    );
   });
 });
