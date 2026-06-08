@@ -354,6 +354,58 @@ describe('PATCH /auth/update-password', () => {
   });
 });
 
+describe('GET /auth/me', () => {
+  let authCookie: string;
+
+  beforeEach(async () => {
+    const hashedPassword = await bcrypt.hash(VALID_PASSWORD, 1);
+
+    await prisma.user.create({
+      data: { email: VALID_EMAIL, password: hashedPassword },
+    });
+
+    const loginRes = await request(app)
+      .post('/auth/login')
+      .send({ email: VALID_EMAIL, password: VALID_PASSWORD });
+
+    authCookie = loginRes.headers['set-cookie']?.[0] ?? '';
+  });
+
+  it('should return 200 with id and email for authenticated user', async () => {
+    const res = await request(app)
+      .get('/auth/me')
+      .set('Cookie', authCookie);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      id: expect.any(String),
+      email: VALID_EMAIL,
+    });
+  });
+
+  it('should not return password in the response', async () => {
+    const res = await request(app)
+      .get('/auth/me')
+      .set('Cookie', authCookie);
+
+    expect(res.body).not.toHaveProperty('password');
+  });
+
+  it('should return 401 when no cookie is provided', async () => {
+    const res = await request(app).get('/auth/me');
+
+    expect(res.status).toBe(401);
+  });
+
+  it('should return 401 when cookie token is invalid', async () => {
+    const res = await request(app)
+      .get('/auth/me')
+      .set('Cookie', 'token=invalidtoken');
+
+    expect(res.status).toBe(401);
+  });
+});
+
 // ─────────────────────────────────────────
 // Cleanup
 // ─────────────────────────────────────────

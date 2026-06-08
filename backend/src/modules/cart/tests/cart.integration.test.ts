@@ -111,6 +111,32 @@ describe('POST /cart/merge', () => {
         expect(res.status).toBe(200);
         expect(res.body.items).toHaveLength(2);
     });
+
+    it('should return 400 if items array is missing', async () => {
+        const res = await request(app).post('/cart/merge').send({});
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if productId is not a valid uuid', async () => {
+        const res = await request(app)
+            .post('/cart/merge')
+            .send({ items: [{ productId: 'not-a-uuid', quantity: 1 }] });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if quantity is 0', async () => {
+        const res = await request(app)
+            .post('/cart/merge')
+            .send({ items: [{ productId: product1.id, quantity: 0 }] });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if quantity exceeds max (5)', async () => {
+        const res = await request(app)
+            .post('/cart/merge')
+            .send({ items: [{ productId: product1.id, quantity: 99 }] });
+        expect(res.status).toBe(400);
+    });
 });
 
 
@@ -132,6 +158,34 @@ describe('POST /cart/items/add', () => {
 
         expect(res.status).toBe(400);
         expect(res.body.message).toBe('Insufficient stock');
+    });
+
+    it('should return 400 if productId is missing', async () => {
+        const res = await request(app)
+            .post('/cart/items/add')
+            .send({ quantity: 1 });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if quantity is missing', async () => {
+        const res = await request(app)
+            .post('/cart/items/add')
+            .send({ productId: product1.id });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if quantity exceeds max (5)', async () => {
+        const res = await request(app)
+            .post('/cart/items/add')
+            .send({ productId: product1.id, quantity: 99 });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if product does not exist', async () => {
+        const res = await request(app)
+            .post('/cart/items/add')
+            .send({ productId: '00000000-0000-0000-0000-000000000000', quantity: 1 });
+        expect(res.status).toBe(404);
     });
 });
 
@@ -162,6 +216,11 @@ describe('DELETE /cart/items/delete/:productId', () => {
         expect(res.status).toBe(404);
         expect(res.body.message).toBe('Item not found in cart');
     });
+
+    it('should return 400 if productId is not a valid uuid', async () => {
+        const res = await request(app).delete('/cart/items/delete/not-a-uuid');
+        expect(res.status).toBe(400);
+    });
 });
 
 describe('PATCH /cart/items/update/:productId', () => {
@@ -189,6 +248,27 @@ describe('PATCH /cart/items/update/:productId', () => {
             .send({ quantity: 0 });
 
         expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if productId is not a valid uuid', async () => {
+        const res = await request(app)
+            .patch('/cart/items/update/not-a-uuid')
+            .send({ quantity: 2 });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 400 if quantity exceeds max (5)', async () => {
+        const res = await request(app)
+            .patch(`/cart/items/update/${product1.id}`)
+            .send({ quantity: 99 });
+        expect(res.status).toBe(400);
+    });
+
+    it('should return 404 if item does not exist in cart', async () => {
+        const res = await request(app)
+            .patch(`/cart/items/update/${product1.id}`)
+            .send({ quantity: 2 });
+        expect(res.status).toBe(404);
     });
 });
 

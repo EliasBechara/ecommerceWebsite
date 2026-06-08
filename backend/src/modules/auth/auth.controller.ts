@@ -38,7 +38,6 @@ export const loginController = asyncHandler(
   },
 );
 
-
 export const getCurrentUser = asyncHandler(
   async (req: Request, res: Response) => {
     const { id } = req.user as JwtPayload;

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { changePassword, loginUser, registerUser } from '../auth.service';
+import { changePassword, findUserById, loginUser, registerUser } from '../auth.service';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../../../lib/prisma';
@@ -365,6 +365,55 @@ describe('changePassword service function', () => {
       expect.objectContaining({
         where: { id: 'user-123' },
         select: { password: true },
+      }),
+    );
+  });
+});
+
+describe('findUserById service function', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should throw 404 if user is not found', async () => {
+    mockedPrisma.user.findUnique.mockResolvedValue(null);
+
+    await expect(findUserById('non-existent-id')).rejects.toThrow(
+      'User not found',
+    );
+  });
+
+  it('should return the user id and email if found', async () => {
+    const fakeUser = { id: 'user-123', email: 'test@test.com' };
+    mockedPrisma.user.findUnique.mockResolvedValue(fakeUser);
+
+    const result = await findUserById('user-123');
+
+    expect(result).toEqual({ id: 'user-123', email: 'test@test.com' });
+  });
+
+  it('should query by the correct user id', async () => {
+    const fakeUser = { id: 'user-123', email: 'test@test.com' };
+    mockedPrisma.user.findUnique.mockResolvedValue(fakeUser);
+
+    await findUserById('user-123');
+
+    expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'user-123' },
+      }),
+    );
+  });
+
+  it('should only select id and email fields', async () => {
+    const fakeUser = { id: 'user-123', email: 'test@test.com' };
+    mockedPrisma.user.findUnique.mockResolvedValue(fakeUser);
+
+    await findUserById('user-123');
+
+    expect(mockedPrisma.user.findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({
+        select: { id: true, email: true },
       }),
     );
   });
