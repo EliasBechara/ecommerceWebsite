@@ -95,7 +95,6 @@ describe('getProductBySlug service function tests', () => {
 describe('findProductsByQuery function tests', () => {
   it('should return products if the search query is correct', async () => {
     const query = 'rtx 5090';
-
     const fakeProducts = [
       {
         id: '1',
@@ -111,18 +110,18 @@ describe('findProductsByQuery function tests', () => {
 
     expect(mockedPrisma.product.findMany).toHaveBeenCalledWith({
       where: {
-        OR: [
+        AND: [
           {
-            name: {
-              contains: query,
-              mode: 'insensitive',
-            },
+            OR: [
+              { name: { contains: 'rtx', mode: 'insensitive' } },
+              { description: { contains: 'rtx', mode: 'insensitive' } },
+            ],
           },
           {
-            description: {
-              contains: query,
-              mode: 'insensitive',
-            },
+            OR: [
+              { name: { contains: '5090', mode: 'insensitive' } },
+              { description: { contains: '5090', mode: 'insensitive' } },
+            ],
           },
         ],
       },

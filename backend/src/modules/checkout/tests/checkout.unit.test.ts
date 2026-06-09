@@ -1,425 +1,409 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../../../lib/prisma';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import {
+    createCheckoutSession,
+    getCheckoutSession,
+    updateCheckoutAddress,
+    calculateCheckoutSummary,
+    confirmCheckoutSession,
+    expireCheckoutSession,
+} from '../checkout.service';
 import { AppError } from '../../../utils/AppError';
-import { createCheckoutSession, getCheckoutSession, updateCheckoutAddress, calculateCheckoutSummary, confirmCheckoutSession, expireCheckoutSession } from '../checkout.service';
-
-
 
 vi.mock('../../../lib/prisma', () => ({
     prisma: {
-        cartItem: {
-            findMany: vi.fn(),
-            deleteMany: vi.fn(),
-        },
-
+        cartItem: { findMany: vi.fn(), deleteMany: vi.fn() },
         checkoutSession: {
             findUnique: vi.fn(),
             create: vi.fn(),
             update: vi.fn(),
         },
-
-        product: {
-            update: vi.fn(),
-        },
-
+        address: { findUnique: vi.fn() },
+        product: { findUnique: vi.fn(), update: vi.fn() },
         $transaction: vi.fn(),
     },
 }));
 
-describe('checkout.service', () => {
-    const userId = 'user-1';
-    const sessionId = 'session-1';
+vi.mock('../../order/order.service', () => ({
+    createOrder: vi.fn(),
+}));
 
+import { createOrder } from '../../order/order.service';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mockedPrisma = prisma as any;
+const mockedCreateOrder = createOrder as ReturnType<typeof vi.fn>;
+
+// ── Shared fixtures ───────────────────────────────────────────────────────────
+
+const mockProduct = { id: 'p1', name: 'Shoes', price: 100, stock: 10 };
+
+const mockCartItems = [
+    { productId: 'p1', quantity: 2, product: mockProduct },
+];
+
+const mockSession = {
+    id: 'session-1',
+    userId: 'user-1',
+    status: 'PENDING',
+    addressId: 'addr-1',
+    expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    items: [
+        { productId: 'p1', quantity: 2, unitPrice: 100, product: mockProduct },
+    ],
+};
+
+
+
+describe('createCheckoutSession', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    describe('createCheckoutSession', () => {
-        it('should create checkout session successfully', async () => {
-            (prisma.cartItem.findMany as any).mockResolvedValue([
-                {
-                    id: 'cart-item-1',
-                    productId: 'product-1',
-                    quantity: 2,
-                    product: {
-                        id: 'product-1',
-                        name: 'RTX 5090',
-                        price: 100,
-                        stock: 10,
-                    },
-                },
-            ]);
+    it('should create a session from valid cart items', async () => {
+        mockedPrisma.cartItem.findMany.mockResolvedValue(mockCartItems);
+        mockedPrisma.checkoutSession.create.mockResolvedValue(mockSession);
 
-            (prisma.checkoutSession.create as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-            });
+        const result = await createCheckoutSession('user-1');
 
-            const result = await createCheckoutSession(userId);
-
-            expect(prisma.cartItem.findMany).toHaveBeenCalled();
-
-            expect(prisma.checkoutSession.create).toHaveBeenCalled();
-
-            expect(result).toEqual({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-            });
+        expect(mockedPrisma.cartItem.findMany).toHaveBeenCalledWith({
+            where: { cart: { userId: 'user-1' } },
+            include: { product: true },
         });
 
-        it('should throw if cart is empty', async () => {
-            (prisma.cartItem.findMany as any).mockResolvedValue([]);
+        expect(mockedPrisma.checkoutSession.create).toHaveBeenCalledWith(
+            expect.objectContaining({
+                data: expect.objectContaining({
+                    userId: 'user-1',
+                    status: 'PENDING',
+                    items: {
+                        create: [
+                            { productId: 'p1', quantity: 2, unitPrice: 100 },
+                        ],
+                    },
+                }),
+            }),
+        );
 
-            await expect(createCheckoutSession(userId)).rejects.toThrow(
-                new AppError('Your cart is empty', 400),
-            );
+        expect(result).toEqual(mockSession);
+    });
+
+    it('should throw 400 if cart is empty', async () => {
+        mockedPrisma.cartItem.findMany.mockResolvedValue([]);
+
+        await expect(createCheckoutSession('user-1')).rejects.toThrow(
+            new AppError('Your cart is empty', 400),
+        );
+    });
+
+    it('should throw 409 if a product has insufficient stock', async () => {
+        const lowStockItems = [
+            { productId: 'p1', quantity: 5, product: { ...mockProduct, stock: 2 } },
+        ];
+
+        mockedPrisma.cartItem.findMany.mockResolvedValue(lowStockItems);
+
+        await expect(createCheckoutSession('user-1')).rejects.toThrow(
+            new AppError(`Insufficient stock for "Shoes". Available: 2`, 409),
+        );
+    });
+});
+
+
+
+describe('getCheckoutSession', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('should return session when valid', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+
+        const result = await getCheckoutSession('session-1', 'user-1');
+
+        expect(result).toEqual(mockSession);
+    });
+
+    it('should throw 404 if session does not exist', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(null);
+
+        await expect(getCheckoutSession('session-1', 'user-1')).rejects.toThrow(
+            new AppError('Checkout session not found', 404),
+        );
+    });
+
+    it('should throw 403 if session belongs to another user', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            userId: 'other-user',
         });
 
-        it('should throw if stock is insufficient', async () => {
-            (prisma.cartItem.findMany as any).mockResolvedValue([
-                {
-                    quantity: 5,
-                    product: {
-                        name: 'RTX 5090',
-                        stock: 1,
-                    },
-                },
-            ]);
+        await expect(getCheckoutSession('session-1', 'user-1')).rejects.toThrow(
+            new AppError('Forbidden', 403),
+        );
+    });
 
-            await expect(createCheckoutSession(userId)).rejects.toThrow(
-                new AppError(
-                    'Insufficient stock for "RTX 5090". Available: 1',
-                    409,
-                ),
-            );
+    it('should throw 410 if session is expired', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            status: 'EXPIRED',
+        });
+
+        await expect(getCheckoutSession('session-1', 'user-1')).rejects.toThrow(
+            new AppError('Session has expired', 410),
+        );
+    });
+
+    it('should throw 409 if session is already confirmed', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            status: 'CONFIRMED',
+        });
+
+        await expect(getCheckoutSession('session-1', 'user-1')).rejects.toThrow(
+            new AppError('Session already confirmed', 409),
+        );
+    });
+});
+
+
+
+describe('updateCheckoutAddress', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('should update address when valid', async () => {
+        const mockAddress = { id: 'addr-1', userId: 'user-1' };
+        const updatedSession = { ...mockSession, addressId: 'addr-1' };
+
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.address.findUnique.mockResolvedValue(mockAddress);
+        mockedPrisma.checkoutSession.update.mockResolvedValue(updatedSession);
+
+        const result = await updateCheckoutAddress('session-1', 'user-1', 'addr-1');
+
+        expect(mockedPrisma.checkoutSession.update).toHaveBeenCalledWith({
+            where: { id: 'session-1' },
+            data: { address: { connect: { id: 'addr-1' } } },
+            include: { items: { include: { product: true } } },
+        });
+
+        expect(result).toEqual(updatedSession);
+    });
+
+    it('should throw 404 if address does not exist', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.address.findUnique.mockResolvedValue(null);
+
+        await expect(
+            updateCheckoutAddress('session-1', 'user-1', 'addr-1'),
+        ).rejects.toThrow(new AppError('Address not found', 404));
+    });
+
+    it('should throw 403 if address belongs to another user', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.address.findUnique.mockResolvedValue({
+            id: 'addr-1',
+            userId: 'other-user',
+        });
+
+        await expect(
+            updateCheckoutAddress('session-1', 'user-1', 'addr-1'),
+        ).rejects.toThrow(new AppError('Forbidden', 403));
+    });
+});
+
+
+
+describe('calculateCheckoutSummary', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('should apply shipping cost when total is <= 200', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+
+        const result = await calculateCheckoutSummary('session-1', 'user-1');
+
+        expect(result).toEqual({
+            sessionId: 'session-1',
+            itemsTotal: 200,
+            shippingCost: 15,
+            total: 215,
         });
     });
 
-    describe('getCheckoutSession', () => {
-        it('should return active session', async () => {
-            const mockedSession = {
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                items: [],
-            };
+    it('should waive shipping cost when items total exceeds 200', async () => {
+        const expensiveSession = {
+            ...mockSession,
+            items: [{ productId: 'p1', quantity: 3, unitPrice: 100, product: mockProduct }],
+        };
 
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue(
-                mockedSession,
-            );
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(expensiveSession);
 
-            const result = await getCheckoutSession(sessionId, userId);
+        const result = await calculateCheckoutSummary('session-1', 'user-1');
 
-            expect(result).toEqual(mockedSession);
-        });
-
-        it('should throw if session does not exist', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue(null);
-
-            await expect(
-                getCheckoutSession(sessionId, userId),
-            ).rejects.toThrow(
-                new AppError('Checkout session not found', 404),
-            );
-        });
-
-        it('should throw if session belongs to another user', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId: 'another-user',
-                status: 'PENDING',
-            });
-
-            await expect(
-                getCheckoutSession(sessionId, userId),
-            ).rejects.toThrow(new AppError('Forbidden', 403));
+        expect(result).toEqual({
+            sessionId: 'session-1',
+            itemsTotal: 300,
+            shippingCost: 0,
+            total: 300,
         });
     });
 
-    describe('updateCheckoutAddress', () => {
-        it('should update address successfully', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-            });
+    it('should throw if session is not found', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(null);
 
-            const updatedSession = {
-                id: sessionId,
-                address: {
-                    city: 'Sao Paulo',
-                },
-            };
+        await expect(
+            calculateCheckoutSummary('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Checkout session not found', 404));
+    });
+});
 
-            (prisma.checkoutSession.update as any).mockResolvedValue(
-                updatedSession,
-            );
 
-            const result = await updateCheckoutAddress(
-                sessionId,
-                userId,
-                {
-                    fullName: 'Elias',
-                    phone: '999999999',
-                    street: 'Street',
-                    number: '123',
-                    city: 'Sao Paulo',
-                    state: 'SP',
-                    zipCode: '00000000',
-                },
-            );
 
-            expect(result).toEqual(updatedSession);
-        });
+describe('confirmCheckoutSession', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    describe('calculateCheckoutSummary', () => {
-        it('should calculate totals correctly', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                items: [
-                    {
-                        quantity: 2,
-                        unitPrice: 100,
-                    },
-                ],
-            });
+    it('should confirm session, decrement stock, create order, and clear cart', async () => {
+        const mockOrder = { id: 'order-1' };
+        const confirmedSession = { ...mockSession, status: 'CONFIRMED' };
 
-            const result = await calculateCheckoutSummary(
-                sessionId,
-                userId,
-            );
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.product.findUnique.mockResolvedValue(mockProduct);
+        mockedPrisma.$transaction.mockResolvedValue([]);
+        mockedCreateOrder.mockResolvedValue(mockOrder);
+        mockedPrisma.checkoutSession.update.mockResolvedValue(confirmedSession);
+        mockedPrisma.cartItem.deleteMany.mockResolvedValue({ count: 1 });
 
-            expect(result).toEqual({
-                sessionId,
-                itemsTotal: 200,
-                shippingCost: 15,
-                total: 215,
-            });
+        const result = await confirmCheckoutSession('session-1', 'user-1');
+
+        expect(mockedPrisma.$transaction).toHaveBeenCalled();
+
+        expect(mockedCreateOrder).toHaveBeenCalledWith('user-1', {
+            items: [{ productId: 'p1', quantity: 2 }],
         });
 
-        it('should apply free shipping', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                items: [
-                    {
-                        quantity: 3,
-                        unitPrice: 100,
-                    },
-                ],
-            });
+        expect(mockedPrisma.checkoutSession.update).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { id: 'session-1' },
+                data: expect.objectContaining({ status: 'CONFIRMED' }),
+            }),
+        );
 
-            const result = await calculateCheckoutSummary(
-                sessionId,
-                userId,
-            );
-
-            expect(result.shippingCost).toBe(0);
+        expect(mockedPrisma.cartItem.deleteMany).toHaveBeenCalledWith({
+            where: { cart: { userId: 'user-1' } },
         });
+
+        expect(result).toEqual({ confirmed: confirmedSession, order: mockOrder });
     });
 
-    describe('confirmCheckoutSession', () => {
-        it('should confirm checkout successfully', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                address: {
-                    city: 'Sao Paulo',
-                },
-                items: [
-                    {
-                        productId: 'product-1',
-                        quantity: 2,
-                    },
-                ],
-            });
-
-            (prisma.$transaction as any).mockResolvedValue(undefined);
-
-            (prisma.checkoutSession.update as any).mockResolvedValue({
-                id: sessionId,
-                status: 'CONFIRMED',
-            });
-
-            const result = await confirmCheckoutSession(
-                sessionId,
-                userId,
-            );
-
-            expect(prisma.$transaction).toHaveBeenCalled();
-
-            expect(prisma.cartItem.deleteMany).toHaveBeenCalled();
-
-            expect(result.status).toBe('CONFIRMED');
+    it('should throw 400 if no address is set', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            addressId: null,
         });
 
-        it('should throw if address is missing', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                address: null,
-                items: [],
-            });
-
-            await expect(
-                confirmCheckoutSession(sessionId, userId),
-            ).rejects.toThrow(
-                new AppError(
-                    'Delivery address is required before confirming',
-                    400,
-                ),
-            );
-        });
+        await expect(
+            confirmCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(
+            new AppError('Delivery address is required before confirming', 400),
+        );
     });
 
-    describe('expireCheckoutSession', () => {
-        it('should expire session successfully', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-            });
+    it('should throw 404 if a product no longer exists', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.product.findUnique.mockResolvedValue(null);
 
-            (prisma.checkoutSession.update as any).mockResolvedValue({
-                id: sessionId,
-                status: 'EXPIRED',
-            });
-
-            const result = await expireCheckoutSession(
-                sessionId,
-                userId,
-            );
-
-            expect(result.status).toBe('EXPIRED');
-        });
+        await expect(
+            confirmCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError(`Product "Shoes" no longer exists`, 404));
     });
 
-    describe('additional checkout validations', () => {
-        it('should throw if session is EXPIRED', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'EXPIRED',
-            });
+    it('should throw 409 if stock is insufficient at confirm time', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.product.findUnique.mockResolvedValue({ ...mockProduct, stock: 1 });
 
-            await expect(
-                getCheckoutSession(sessionId, userId),
-            ).rejects.toThrow(
-                new AppError('Session has expired', 410),
-            );
-        });
-
-        it('should throw if session is CONFIRMED', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'CONFIRMED',
-            });
-
-            await expect(
-                getCheckoutSession(sessionId, userId),
-            ).rejects.toThrow(
-                new AppError('Session already confirmed', 409),
-            );
-        });
-
-        it('should clear cart after successful confirmation', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                address: {
-                    city: 'Sao Paulo',
-                },
-                items: [
-                    {
-                        productId: 'product-1',
-                        quantity: 1,
-                    },
-                ],
-            });
-
-            (prisma.$transaction as any).mockResolvedValue(undefined);
-
-            (prisma.checkoutSession.update as any).mockResolvedValue({
-                id: sessionId,
-                status: 'CONFIRMED',
-            });
-
-            await confirmCheckoutSession(sessionId, userId);
-
-            expect(prisma.cartItem.deleteMany).toHaveBeenCalledWith({
-                where: {
-                    cart: {
-                        userId,
-                    },
-                },
-            });
-        });
-
-        it('should decrement stock correctly', async () => {
-            (prisma.checkoutSession.findUnique as any).mockResolvedValue({
-                id: sessionId,
-                userId,
-                status: 'PENDING',
-                address: {
-                    city: 'Sao Paulo',
-                },
-                items: [
-                    {
-                        productId: 'product-1',
-                        quantity: 2,
-                    },
-                    {
-                        productId: 'product-2',
-                        quantity: 3,
-                    },
-                ],
-            });
-
-            (prisma.product.update as any).mockResolvedValue({});
-
-            (prisma.$transaction as any).mockResolvedValue(undefined);
-
-            (prisma.checkoutSession.update as any).mockResolvedValue({
-                id: sessionId,
-                status: 'CONFIRMED',
-            });
-
-            await confirmCheckoutSession(sessionId, userId);
-
-            expect(prisma.product.update).toHaveBeenNthCalledWith(1, {
-                where: {
-                    id: 'product-1',
-                },
-                data: {
-                    stock: {
-                        decrement: 2,
-                    },
-                },
-            });
-
-            expect(prisma.product.update).toHaveBeenNthCalledWith(2, {
-                where: {
-                    id: 'product-2',
-                },
-                data: {
-                    stock: {
-                        decrement: 3,
-                    },
-                },
-            });
-        });
+        await expect(
+            confirmCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError(`Insufficient stock for "Shoes"`, 409));
     });
 
+    it('should throw if session is expired', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            status: 'EXPIRED',
+        });
 
+        await expect(
+            confirmCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Session has expired', 410));
+    });
+});
+
+
+describe('expireCheckoutSession', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it('should expire a pending session', async () => {
+        const expiredSession = { ...mockSession, status: 'EXPIRED' };
+
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(mockSession);
+        mockedPrisma.checkoutSession.update.mockResolvedValue(expiredSession);
+
+        const result = await expireCheckoutSession('session-1', 'user-1');
+
+        expect(mockedPrisma.checkoutSession.update).toHaveBeenCalledWith({
+            where: { id: 'session-1' },
+            data: { status: 'EXPIRED' },
+        });
+
+        expect(result).toEqual(expiredSession);
+    });
+
+    it('should throw 404 if session does not exist', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue(null);
+
+        await expect(
+            expireCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Checkout session not found', 404));
+    });
+
+    it('should throw 403 if session belongs to another user', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            userId: 'other-user',
+        });
+
+        await expect(
+            expireCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Forbidden', 403));
+    });
+
+    it('should throw 410 if session is already expired', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            status: 'EXPIRED',
+        });
+
+        await expect(
+            expireCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Session has expired', 410));
+    });
+
+    it('should throw 409 if session is already confirmed', async () => {
+        mockedPrisma.checkoutSession.findUnique.mockResolvedValue({
+            ...mockSession,
+            status: 'CONFIRMED',
+        });
+
+        await expect(
+            expireCheckoutSession('session-1', 'user-1'),
+        ).rejects.toThrow(new AppError('Session already confirmed', 409));
+    });
 });
