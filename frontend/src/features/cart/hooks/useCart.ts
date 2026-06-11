@@ -8,14 +8,14 @@ export const useCart = () => {
 
     const { data, isLoading } = useGetCartQuery(undefined, {
         skip: !user,
-    });
+    }) ?? {};
 
-    const items = user ? data?.items ?? [] : guestCart;
+    const items = user ? data?.items ?? [] : guestCart ?? [];
 
 
     return {
         items,
-        isLoading: user ? isLoading : false,
+        isLoading: user ? isLoading ?? false : false,
         isGuest: !user,
     };
 };
