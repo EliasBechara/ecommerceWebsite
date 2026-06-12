@@ -3,23 +3,18 @@ import { AddressListItem } from './AddressListItem'
 
 interface AddressListProps {
     addresses: UserAddress[]
-
     editingAddress: UserAddress | null
 
     onUpdate: (
         data: CreateAddressInput,
     ) => Promise<void>
-
     onCancelEdit: () => void
 
     onEdit: (address: UserAddress) => void
-
     onDelete: (id: string) => void
-
     onSetDefault: (id: string) => void
 
     isUpdating: boolean
-
     isDeleting: boolean
 }
 

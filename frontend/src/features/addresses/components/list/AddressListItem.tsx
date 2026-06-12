@@ -1,29 +1,21 @@
-
-
 import type { UserAddress, CreateAddressInput } from '../../api/addressesApi'
 import { AddressCard } from '../card/AddressCard'
-
 import { AddressForm } from '../forms/AddressForm'
 
 interface AddressListItemProps {
     address: UserAddress
-
     editingAddress: UserAddress | null
 
     onUpdate: (
         data: CreateAddressInput,
     ) => Promise<void>
-
     onCancelEdit: () => void
 
     onEdit: (address: UserAddress) => void
-
     onDelete: (id: string) => void
-
     onSetDefault: (id: string) => void
 
     isUpdating: boolean
-
     isDeleting: boolean
 }
 
