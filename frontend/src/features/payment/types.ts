@@ -1,5 +1,3 @@
-// features/payment/types/index.ts
-
 export type PaymentMethod =
     | "CREDIT_CARD"
     | "DEBIT_CARD"
