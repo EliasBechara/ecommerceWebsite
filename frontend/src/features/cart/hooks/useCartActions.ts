@@ -13,43 +13,62 @@ export const useCartActions = () => {
     const user = useSelector((state: RootState) => state.auth.user);
     const dispatch = useAppDispatch();
 
-    const add = async (product: Product, quantity: number) => {
-        if (!user) {
-            dispatch(addToCart({ product, quantity }));
-            return;
-        }
+    const add = async (
+        product: Product,
+        quantity: number,
+    ) => {
+        dispatch(addToCart({ product, quantity }));
 
-        await dispatch(
-            cartApi.endpoints.addItem.initiate({
-                productId: product.id,
-                quantity,
-            })
-        ).unwrap();
+        if (!user) return;
+
+        try {
+            await dispatch(
+                cartApi.endpoints.addItem.initiate({
+                    productId: product.id,
+                    quantity,
+                }),
+            ).unwrap();
+        } catch {
+            dispatch(removeFromCart(product.id));
+        }
     };
 
     const remove = async (productId: string) => {
-        if (!user) {
-            dispatch(removeFromCart(productId));
-            return;
-        }
+        dispatch(removeFromCart(productId));
 
-        await dispatch(
-            cartApi.endpoints.removeItem.initiate(productId)
-        ).unwrap();
+        if (!user) return;
+
+        try {
+            await dispatch(
+                cartApi.endpoints.removeItem.initiate(productId),
+            ).unwrap();
+        } catch {
+            // optionally refetch cart
+        }
     };
 
-    const update = async (productId: string, quantity: number) => {
-        if (!user) {
-            dispatch(updateItemQuantity({ id: productId, quantity }));
-            return;
-        }
-
-        await dispatch(
-            cartApi.endpoints.updateItem.initiate({
-                productId,
+    const update = async (
+        productId: string,
+        quantity: number,
+    ) => {
+        dispatch(
+            updateItemQuantity({
+                id: productId,
                 quantity,
-            })
-        ).unwrap();
+            }),
+        );
+
+        if (!user) return;
+
+        try {
+            await dispatch(
+                cartApi.endpoints.updateItem.initiate({
+                    productId,
+                    quantity,
+                }),
+            ).unwrap();
+        } catch {
+        }
     };
 
     return { add, remove, update };

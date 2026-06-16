@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { Button } from "../button/Button";
-import { NavSidebar } from "./NavSidebar";
+import { NavSidebar } from "../navbar/NavSidebar";
 import { SearchBar } from "../../features/products/components/SearchBar";
 import { Cart } from "../../features/cart/components/Cart";
 import { useSelector } from "react-redux";
 
-import { useUIOverlay } from "../../hooks/useUIOverlay";
+import { useUIOverlay } from "../../features/ui/hooks/useUIOverlay";
 import { selectIsAuthenticated } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 import { useCartSummary } from "../../features/cart/hooks/useCartSummary";

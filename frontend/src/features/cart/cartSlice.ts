@@ -20,13 +20,16 @@ export const cartSlice = createSlice({
   reducers: {
 
     addToCart(state, action: PayloadAction<CartItemType>) {
-      const exists = state.list.some(
-        (item) => item.product.id === action.payload.product.id
+      const item = state.list.find(
+        (item) =>
+          item.product.id === action.payload.product.id
       );
 
-      if (exists) return;
-
-      state.list.push(action.payload);
+      if (item) {
+        item.quantity += action.payload.quantity;
+      } else {
+        state.list.push(action.payload);
+      }
     },
 
     removeFromCart(state, action: PayloadAction<string>) {

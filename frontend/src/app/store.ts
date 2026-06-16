@@ -11,6 +11,7 @@ import { paymentApi } from "../features/payment/api/paymentApi";
 import { orderApi } from "../features/order/api/orderApi";
 import { accountApi } from "../features/account/api/accountApi";
 import { addressesApi } from "../features/addresses/api/addressesApi";
+import uiReducer from "../features/ui/uiSlice";
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     [orderApi.reducerPath]: orderApi.reducer,
     [accountApi.reducerPath]: accountApi.reducer,
     [addressesApi.reducerPath]: addressesApi.reducer,
+    ui: uiReducer,
   },
 
   middleware: (getDefaultMiddleware) =>

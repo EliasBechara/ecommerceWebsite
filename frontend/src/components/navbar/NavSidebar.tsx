@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../button/Button";
 import { CATEGORIES, ROUTES } from "../../routes";
 import { SidePanel } from "../sidePanel/SidePanel";
+import { useUIOverlay } from "../../features/ui/hooks/useUIOverlay";
 
 type SidebarProps = {
   isSidebarOpen: boolean;
@@ -12,6 +13,16 @@ export const NavSidebar = ({
   isSidebarOpen,
   setIsSidebarOpen,
 }: SidebarProps) => {
+
+  const { open } = useUIOverlay();
+
+
+  const handleOpenSearchBar = () => {
+    setIsSidebarOpen(false)
+    open("search")
+  }
+
+
   return (
     <>
       <SidePanel
@@ -31,8 +42,10 @@ export const NavSidebar = ({
           <Button variant={"sidebar"}>
             <Link to={ROUTES.category(CATEGORIES.CPU)}>CPU</Link>
           </Button>
-          <Button variant={"sidebar"}>Search</Button>
-          <Button variant={"sidebar"}>Settings</Button>
+          <Button variant={"sidebar"} onClick={handleOpenSearchBar}>Search</Button>
+          <Button variant={"sidebar"}>
+            <Link to={'/account'}>Account Settings</Link>
+          </Button>
         </nav>
       </SidePanel>
     </>
