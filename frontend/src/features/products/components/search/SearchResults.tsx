@@ -1,5 +1,5 @@
-import type { Product } from "../productTypes";
-import { ProductCard } from "./ProductCard";
+import type { Product } from "../../productTypes";
+import { ProductCard } from "../products/ProductCard";
 
 type Props = {
     results: Product[];

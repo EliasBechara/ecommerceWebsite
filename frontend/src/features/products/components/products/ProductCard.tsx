@@ -1,9 +1,9 @@
-import { Button } from "../../../components/button/Button";
-import { formatUSD } from "../../../utils/formatCurrency";
-import type { Product } from "../productTypes";
+import { Button } from "../../../../components/button/Button";
+import { formatUSD } from "../../../../utils/formatCurrency";
+import type { Product } from "../../productTypes";
 import { Link } from "react-router-dom";
 import type React from "react";
-import { useCartActions } from "../../cart/hooks/useCartActions";
+import { useCartActions } from "../../../cart/hooks/useCartActions";
 
 type ProductCardVariant = "default" | "custom";
 

@@ -1,5 +1,5 @@
 import { Button } from "../../../components/button/Button";
-import { ProductBase } from "../../products/components/ProductBase";
+import { ProductBase } from "../../products/components/products/ProductBase";
 import { formatUSD } from "../../../utils/formatCurrency";
 import type { Product } from "../../products/productTypes";
 

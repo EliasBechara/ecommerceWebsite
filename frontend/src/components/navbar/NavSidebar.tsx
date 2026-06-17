@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "../button/Button";
-import { CATEGORIES, ROUTES } from "../../routes";
+import { CATEGORIES, ROUTES } from "../../router/routes";
 import { SidePanel } from "../sidePanel/SidePanel";
 import { useUIOverlay } from "../../features/ui/hooks/useUIOverlay";
 

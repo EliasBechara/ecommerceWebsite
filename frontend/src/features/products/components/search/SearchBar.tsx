@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useProductSearch } from "../hooks/useProductSearch";
+import { useProductSearch } from "../../hooks/useProductSearch";
 import { SearchInput } from "./SearchInput";
 import { SearchResults } from "./SearchResults";
 

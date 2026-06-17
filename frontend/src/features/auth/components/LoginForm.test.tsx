@@ -26,7 +26,7 @@ vi.mock("../utils/handleApiError", () => ({
   handleApiError: vi.fn(),
 }));
 
-import { handleApiError } from "../utils/handleApiError";
+import { handleApiError } from "../../../api/handleApiError";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fillForm = async (email: string, password: string) => {

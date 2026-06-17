@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AuthCard from "./AuthCard";
 import { useLoginMutation } from "../api/authApi";
-import { handleApiError } from "../utils/handleApiError";
+import { handleApiError } from "../../../api/handleApiError";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const loginSchema = z.object({

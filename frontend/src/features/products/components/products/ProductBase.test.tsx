@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { ProductBase } from "./ProductBase";
-import * as currencyUtils from "../../../utils/formatCurrency";
+import * as currencyUtils from "../../../../utils/formatCurrency";
 import { vi } from "vitest";
 
 describe("ProductBase", () => {

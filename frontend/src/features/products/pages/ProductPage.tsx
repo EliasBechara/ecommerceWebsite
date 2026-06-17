@@ -3,7 +3,7 @@ import { useGetProductBySlugQuery } from "../api/productsApi";
 import { PageLayout } from "../../../components/layout/PageLayout";
 import { Button } from "../../../components/button/Button";
 import { formatUSD } from "../../../utils/formatCurrency";
-import { ProductPageSkeleton } from "../components/ProductPageSkeleton";
+import { ProductPageSkeleton } from "../components/products/ProductPageSkeleton";
 import { ErrorMessage } from "../components/ErrorMessage";
 import { useCartActions } from "../../cart/hooks/useCartActions";
 

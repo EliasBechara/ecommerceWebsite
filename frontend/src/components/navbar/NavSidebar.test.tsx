@@ -4,7 +4,7 @@ import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 
 import { NavSidebar } from "./NavSidebar";
-import { CATEGORIES, ROUTES } from "../../routes";
+import { CATEGORIES, ROUTES } from "../../router/routes";
 
 const openMock = vi.fn();
 

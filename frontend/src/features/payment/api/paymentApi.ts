@@ -1,5 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { baseQuery } from "../../auth/api/baseQuery";
+import { baseQuery } from "../../../api/baseQuery";
 
 import type {
     CreatePaymentBody,

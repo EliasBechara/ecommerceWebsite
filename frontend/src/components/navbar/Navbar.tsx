@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Button } from "../button/Button";
 import { NavSidebar } from "../navbar/NavSidebar";
-import { SearchBar } from "../../features/products/components/SearchBar";
+import { SearchBar } from "../../features/products/components/search/SearchBar";
 import { Cart } from "../../features/cart/components/Cart";
 import { useSelector } from "react-redux";
 

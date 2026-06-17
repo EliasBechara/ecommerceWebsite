@@ -1,10 +1,11 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { useGetProductsByCategoryQuery } from "../api/productsApi";
-import { ProductList } from "../components/ProductList";
+import { ProductList } from "../components/products/ProductList";
 import { PageLayout } from "../../../components/layout/PageLayout";
 import { ErrorMessage } from "../components/ErrorMessage";
-import { getErrorMessage } from "../../../utils/getErrorMessage";
+
 import { SortDropdown } from "../components/SortDropdown";
+import { getApiErrorMessage } from "../../../api/apiError";
 
 type Props = {
   forcedCategory?: string;
@@ -31,7 +32,7 @@ export const CategoryPage = ({ forcedCategory }: Props) => {
   if (isError) {
     return (
       <PageLayout>
-        <ErrorMessage message={getErrorMessage(error)} />
+        <ErrorMessage message={getApiErrorMessage(error)} />
       </PageLayout>
     );
   }

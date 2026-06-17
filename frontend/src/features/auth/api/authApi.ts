@@ -1,6 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { setHydrated, setUser } from "../authSlice";
-import { baseQuery } from "./baseQuery";
+import { baseQuery } from "../../../api/baseQuery";
 import type { RootState } from "../../../app/store";
 import { cartApi } from "../../cart/api/cartApi";
 

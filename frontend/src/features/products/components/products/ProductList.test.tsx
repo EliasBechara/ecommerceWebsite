@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { ProductList } from "./ProductList";
 import { vi } from "vitest";
-import type { Product } from "../productTypes";
+import type { Product } from "../../productTypes";
 
 vi.mock("./ProductCard", () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

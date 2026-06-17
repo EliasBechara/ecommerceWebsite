@@ -1,4 +1,4 @@
-import type { Product } from "../productTypes";
+import type { Product } from "../../productTypes";
 import { ProductCard } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 
