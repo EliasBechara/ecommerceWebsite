@@ -5,7 +5,7 @@ import { render } from "@testing-library/react";
 import type { RenderOptions } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
-import { store } from "./app/store";
+import { store } from "../app/store";
 
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (

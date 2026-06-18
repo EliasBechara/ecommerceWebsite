@@ -20,10 +20,12 @@ export const accountApi = createApi({
     baseQuery,
     tagTypes: ["Profile"],
     endpoints: (builder) => ({
+
         getProfile: builder.query<UserProfile, void>({
             query: () => "/users/me",
             providesTags: ["Profile"],
         }),
+
         updateProfile: builder.mutation<UserProfile, UpdateProfileInput>({
             query: (body) => ({
                 url: "/users/me/profile",

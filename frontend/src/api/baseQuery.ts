@@ -14,7 +14,10 @@ type NormalizedError = {
 };
 
 const rawBaseQuery = fetchBaseQuery({
-  baseUrl: "/api",
+  baseUrl:
+    import.meta.env.MODE === "test"
+      ? "http://localhost/api"
+      : "/api",
   credentials: "include",
 });
 
