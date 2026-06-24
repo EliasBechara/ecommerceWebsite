@@ -1,8 +1,11 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { setHydrated, setUser } from "../authSlice";
+
+import { setHydrated, setUser, logout as logoutAction } from "../authSlice";
+
 import { baseQuery } from "../../../api/baseQuery";
 import type { RootState } from "../../../app/store";
 import { cartApi } from "../../cart/api/cartApi";
+
 
 // ─── Response Types ─────────────────────────────────────────────
 interface AuthResponse {
@@ -103,6 +106,27 @@ export const authApi = createApi({
         }
       },
     }),
+
+    // ====================== LOGOUT ======================
+
+    logout: builder.mutation<{ message: string }, void>({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+
+      async onQueryStarted(_, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          dispatch(logoutAction());
+          dispatch(cartApi.util.invalidateTags(["Cart"]));
+        } catch (err) {
+          console.error("Logout error:", err);
+        } finally {
+          dispatch(setHydrated());
+        }
+      },
+    }),
   }),
 });
 
@@ -110,4 +134,5 @@ export const {
   useRegisterMutation,
   useLoginMutation,
   useGetMeQuery,
+  useLogoutMutation,
 } = authApi;

@@ -57,3 +57,19 @@ export const updatePasswordController = asyncHandler(async (req: Request, res: R
 
   res.status(200).json({ message: 'Password Updated Successfully!' })
 })
+
+export const logoutController = asyncHandler(
+  async (_req: Request, res: Response) => {
+
+    res.clearCookie('token', {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+    });
+
+    return res.status(200).json({
+      message: 'Logged out successfully',
+    });
+  },
+);

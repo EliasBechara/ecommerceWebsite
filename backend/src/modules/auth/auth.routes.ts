@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Router } from 'express';
-import { getCurrentUser, loginController, registerController, updatePasswordController } from './auth.controller';
+import { getCurrentUser, loginController, logoutController, registerController, updatePasswordController } from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { loginSchema, registerSchema, updatePasswordSchema } from './auth.schemas';
 import rateLimit from 'express-rate-limit';
@@ -52,5 +52,7 @@ router.get('/me', protect, getCurrentUser);
 
 
 router.patch('/update-password', updatePasswordLimiter, protect, validate(updatePasswordSchema, 'body'), updatePasswordController)
+
+router.post('/logout', logoutController);
 
 export default router;

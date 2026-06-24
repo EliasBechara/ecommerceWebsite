@@ -9,6 +9,7 @@ export const AccountSidebar = ({ activeTab, setActiveTab }: AccountSidebarProps)
         { id: "orders", label: "Order History" },
         { id: "addresses", label: "Addresses" },
         { id: "security", label: "Security" },
+        { id: "logout", label: "Logout" }
     ];
 
     return (

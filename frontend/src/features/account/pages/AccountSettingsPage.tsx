@@ -5,6 +5,7 @@ import { ProfileDetails } from "../components/profile/ProfileDetails";
 import { UserAddresses } from "../../addresses/components/UserAddresses";
 import { UserSecurityDetails } from "../components/profile/UserSecurityDetails";
 import { UserOrderHistory } from "../../order/components/UserOrderHistory";
+import { LogoutUser } from "../components/profile/LogoutUser";
 
 
 export const AccountSettingsPage = () => {
@@ -23,6 +24,9 @@ export const AccountSettingsPage = () => {
 
             case "orders":
                 return <UserOrderHistory />
+
+            case "logout":
+                return <LogoutUser />
 
             default:
                 return null;
