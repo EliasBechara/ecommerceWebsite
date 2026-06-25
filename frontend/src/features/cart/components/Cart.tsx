@@ -6,6 +6,8 @@ import { useCartActions } from "../hooks/useCartActions";
 import { useCartSummary } from "../hooks/useCartSummary";
 import { type CartItemType } from "../cartSlice";
 import { useCreateSessionMutation } from "../../checkout/api/checkoutApi";
+import { selectIsAuthenticated } from "../../auth/authSlice";
+import { useSelector } from "react-redux";
 
 interface CartProps {
   isOpen: boolean;
@@ -18,6 +20,8 @@ export const Cart = ({ isOpen, setIsOpen }: CartProps) => {
   const { items: cartItems, totalPrice } = useCartSummary();
 
   const { update, remove } = useCartActions();
+
+  const isAuthenticated = useSelector(selectIsAuthenticated);
 
   const [createSession, { isLoading: creatingSession }] =
     useCreateSessionMutation();
@@ -40,6 +44,15 @@ export const Cart = ({ isOpen, setIsOpen }: CartProps) => {
 
   const handleCheckout = async () => {
     try {
+      if (!isAuthenticated) {
+        navigate("/login", {
+          state: {
+            continueCheckout: true,
+          },
+        });
+        return;
+      }
+
       const session = await createSession().unwrap();
 
       setIsOpen(false);

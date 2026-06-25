@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import AuthCard from "./AuthCard";
 import { useLoginMutation } from "../api/authApi";
 import { handleApiError } from "../../../api/handleApiError";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // ─── Schema ───────────────────────────────────────────────────────────────────
 const loginSchema = z.object({
@@ -35,7 +35,14 @@ const LOGIN_FIELDS = [
 // ─── Main ────────────────────────────────────────────────────────────────
 export const LoginForm = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const continueCheckout = location.state?.continueCheckout;
+  const checkoutUrl = location.state?.checkoutUrl;
+
+
   const [loginUser, { isLoading }] = useLoginMutation();
+
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
@@ -45,6 +52,12 @@ export const LoginForm = () => {
   const handleLogin = async (values: LoginFormValues) => {
     try {
       await loginUser(values).unwrap();
+
+      if (continueCheckout && checkoutUrl) {
+        navigate(checkoutUrl);
+        return;
+      }
+
       navigate("/");
     } catch (err) {
       handleApiError(

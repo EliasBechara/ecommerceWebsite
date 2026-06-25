@@ -19,5 +19,13 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    overrides: [
+      {
+        files: ["e2e/**/*.ts"],
+        rules: {
+          "react-hooks/rules-of-hooks": "off"
+        }
+      }
+    ]
   },
 ])
