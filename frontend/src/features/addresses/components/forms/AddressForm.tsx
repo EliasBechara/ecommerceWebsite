@@ -122,6 +122,7 @@ export const AddressForm = ({
                     type="submit"
                     variant="profileSettings"
                     disabled={isLoading}
+                    data-testid="submit-adress-form"
                 >
                     {isLoading
                         ? 'Saving...'

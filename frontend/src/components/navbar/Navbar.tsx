@@ -43,7 +43,7 @@ export const Navbar = () => {
 
         <div className="flex items-center gap-4">
           <Button>{isAuthenticated ? <Link to='/account'>Account</Link> : <Link to='/login'>Log in</Link>}</Button>
-          <Button variant="outline" onClick={() => open("cart")}>
+          <Button variant="outline" onClick={() => open("cart")} data-testid="cart-button">
             Cart: {totalItems > 9 ? "+9" : totalItems}
           </Button>
         </div>

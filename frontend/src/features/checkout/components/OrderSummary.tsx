@@ -67,6 +67,7 @@ export const OrderSummary = ({
                 type="submit"
                 onClick={onSubmit}
                 disabled={confirming || updatingAddress}
+                data-testid="place-order-button"
                 className="w-full h-12 bg-black hover:bg-zinc-900 transition-colors duration-300 text-white rounded-xl mt-8 cursor-pointer disabled:opacity-50"
             >
                 {confirming

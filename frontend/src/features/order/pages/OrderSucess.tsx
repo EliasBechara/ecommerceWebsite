@@ -49,7 +49,7 @@ export const PaymentSuccessPage = () => {
                             </span>
                         </div>
 
-                        <h1 className="mt-6 text-3xl font-semibold">
+                        <h1 className="mt-6 text-3xl font-semibold" data-testid="payment-success-title">
                             Payment confirmed
                         </h1>
 
@@ -94,6 +94,7 @@ export const PaymentSuccessPage = () => {
                             <Link
                                 to={`/orders/${order.id}`}
                                 className="rounded-xl bg-black px-6 py-3 text-white transition hover:bg-zinc-800"
+                                data-testid="view-order-button"
                             >
                                 View order
                             </Link>

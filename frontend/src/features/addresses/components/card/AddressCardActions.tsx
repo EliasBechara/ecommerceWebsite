@@ -35,6 +35,7 @@ export const AddressCardActions = ({
             <Button
                 type="button"
                 variant="actionText"
+                data-testid="edit-address-button"
                 onClick={() => onEdit(address)}
             >
                 Edit
@@ -46,6 +47,7 @@ export const AddressCardActions = ({
                 onClick={() =>
                     onDelete(address.id)
                 }
+                data-testid="removeAddressButton"
                 disabled={isDeleting}
             >
                 Remove

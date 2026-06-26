@@ -29,7 +29,7 @@ export const PaymentPage = () => {
         <PageLayout>
             <div className="space-y-6">
                 <div>
-                    <h1 className="text-3xl font-bold">Payment</h1>
+                    <h1 className="text-3xl font-bold" data-testid="payment-page-title" >Payment</h1>
                     <p className="text-gray-500 mt-2">Complete your mock payment.</p>
                 </div>
 
@@ -45,7 +45,7 @@ export const PaymentPage = () => {
                     onClick={handlePayment}
                     disabled={isProcessing}
                     className="w-full bg-black text-white rounded-xl py-4 font-semibold hover:opacity-90 transition disabled:opacity-50 cursor-pointer"
-
+                    data-testId="payNowButton"
                 >
                     {isProcessing ? "Processing Payment..." : "Pay Now"}
                 </button>
