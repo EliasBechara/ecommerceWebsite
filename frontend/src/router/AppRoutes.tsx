@@ -11,10 +11,15 @@ import { ProtectedRoute } from "../components/routes/ProtectedRoute";
 import { AccountSettingsPage } from "../features/account/pages/AccountSettingsPage";
 import { OrderDetailsPage } from "../features/order/pages/OrderDetails";
 import { PaymentSuccessPage } from "../features/order/pages/OrderSucess";
+import { PrivacyPolicy } from "../pages/PrivacyPolicy";
+import { ReturnsAndRefunds } from "../pages/ReturnsAndRefunds";
+import { TermsAndConditions } from "../pages/TermsAndConditions";
+import { ContactUs } from "../pages/ContactUs";
 
 export function AppRoutes() {
     return (
         <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
 
             <Route path="/login" element={<LoginPage />} />
@@ -25,6 +30,13 @@ export function AppRoutes() {
                 element={<CategoryPage />}
             />
             <Route path="/products/:slug" element={<ProductPage />} />
+
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/returns-and-refunds" element={<ReturnsAndRefunds />} />
+            <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+            <Route path="/contact" element={<ContactUs />} />
+
+            {/* Protected Routes */}
 
             <Route element={<ProtectedRoute />}>
                 <Route
