@@ -47,9 +47,9 @@ export default function AuthCard<T extends FieldValues>({
   const uid = useId();
 
   return (
-    <div className="w-full flex items-center justify-center h-screen bg-greyOne">
+    <div className="w-full min-h-screen flex items-center justify-center bg-greyOne p-4">
       <div
-        className={`bg-greyOneAccent rounded-2xl p-12 gap-6  flex flex-col justify-between w-full max-w-md shadow-2xl ${className}`}
+        className={`bg-greyOneAccent rounded-2xl p-6 sm:p-8 md:p-12 gap-6  flex flex-col justify-between w-full max-w-md shadow-2xl ${className}`}
       >
         <div className="flex flex-col gap-1">
           <h1 className="text-xl font-semibold text-black">{title}</h1>

@@ -1,34 +1,60 @@
 import type { Product } from "../../productTypes";
+import { SortDropdown } from "../SortDropdown";
 import { ProductCard } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
+
+type SortOption = "price_asc" | "price_desc" | "newest";
 
 interface ProductListProps {
   title?: string;
   products: Product[] | undefined;
   isLoading: boolean;
+  onChange: (sort: SortOption) => void;
+  currentSort: string;
 }
 
 export const ProductList = ({
   title = "Collection",
   products = [],
   isLoading = false,
+  onChange,
+  currentSort,
 }: ProductListProps) => {
   const displayProducts = products ?? [];
 
   return (
-    <section className="flex flex-col items-center px-4 sm:px-6 lg:px-8 pt-8 sm:pt-10 w-full max-w-5xl mx-auto">
-      <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-wide mb-10 sm:mb-16 lg:mb-20 uppercase">
-        {title}
-      </h1>
+    <section className="space-y-6">
+      <h2 className="text-2xl font-semibold text-center">{title}</h2>
 
-      <div className="grid w-full grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, i) => (
-            <ProductCardSkeleton key={i} />
-          ))
-          : displayProducts.map((item) => (
-            <ProductCard key={item.id} product={item} />
-          ))}
+      <div className="flex justify-center">
+        <div className="w-full max-w-fit">
+          <div className="mb-4 flex justify-end">
+            <SortDropdown
+              onChange={onChange}
+              currentSort={currentSort}
+            />
+          </div>
+
+          <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-[250px] sm:w-[300px] flex-shrink-0 snap-start"
+                >
+                  <ProductCardSkeleton />
+                </div>
+              ))
+              : displayProducts.map((item) => (
+                <div
+                  key={item.id}
+                  className="w-[250px] sm:w-[300px] flex-shrink-0 snap-start ml-5"
+                >
+                  <ProductCard product={item} />
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
 
       {!isLoading && displayProducts.length === 0 && (

@@ -1,7 +1,7 @@
 import { cva } from "class-variance-authority";
 
 export const sidePanelStyles = cva(
-  "fixed top-0 h-full w-100 bg-greyOne text-white z-50 p-6 transform transition-transform duration-300 ease-in-out",
+  "fixed top-0 h-full w-[85vw] max-w-sm bg-greyOne text-white z-50 p-6 transform transition-transform duration-300 ease-in-out",
   {
     variants: {
       position: {

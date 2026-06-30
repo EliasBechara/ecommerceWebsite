@@ -39,11 +39,13 @@ export const CategoryPage = ({ forcedCategory }: Props) => {
 
   return (
     <PageLayout>
-      <SortDropdown onChange={handleSortChange} currentSort={sort} />
+
       <ProductList
         title={categoryName}
         products={products}
         isLoading={isLoading}
+        onChange={handleSortChange}
+        currentSort={sort}
       />
     </PageLayout>
   );
