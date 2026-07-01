@@ -27,7 +27,7 @@ export const PaymentPage = () => {
 
     return (
         <PageLayout>
-            <div className="space-y-6">
+            <div className="mx-auto space-y-6 max-w-3xl">
                 <div>
                     <h1 className="text-3xl font-bold" data-testid="payment-page-title" >Payment</h1>
                     <p className="text-gray-500 mt-2">Complete your mock payment.</p>

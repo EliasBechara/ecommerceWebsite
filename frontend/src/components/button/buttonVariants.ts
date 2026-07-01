@@ -41,16 +41,33 @@ export const buttonVariants = cva(
           px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors justify-center
         `,
         actionText: `
-  text-xs text-zinc-500
-  hover:text-zinc-800
-  transition-colors
-`,
+          text-xs text-zinc-500
+          hover:text-zinc-800
+          transition-colors
+        `,
         dangerText: `
-  text-xs text-red-400
-  hover:text-red-600
-  transition-colors
-  disabled:opacity-50
-`
+          text-xs text-red-400
+          hover:text-red-600
+          transition-colors
+          disabled:opacity-50
+        `,
+        accountSidebar: `
+            cursor-pointer
+            pb-2
+            pl-4
+            text-left
+            transition-all
+        `,
+        accountSidebarMobile: `
+            shrink-0
+            rounded-lg
+            px-4
+            py-2
+            text-sm
+            font-medium
+            transition-colors
+            cursor-pointer
+        `,
       },
     },
     defaultVariants: {

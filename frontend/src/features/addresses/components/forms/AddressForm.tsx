@@ -4,7 +4,6 @@ import {
     useWatch,
 } from 'react-hook-form'
 import { Button } from '../../../../components/button/Button'
-
 import { AddressFormFields } from './AddressFormFields'
 import { AddressLabelSelector } from './AddressLabelSelector'
 import { handleAddressFormError } from '../../utils/handleAddressFormError'
@@ -47,7 +46,6 @@ export const AddressForm = ({
             defaultValues:
                 initial ?? emptyForm(),
         })
-
     const {
         register,
         handleSubmit,
@@ -56,12 +54,10 @@ export const AddressForm = ({
         control,
         formState: { errors },
     } = form
-
     const label = useWatch({
         control,
         name: 'label',
     })
-
     const onFormSubmit = async (
         data: CreateAddressInput,
     ) => {
@@ -69,20 +65,18 @@ export const AddressForm = ({
             await onSubmit(data)
         } catch (error: any) {
             console.log(error)
-
             handleAddressFormError(
                 error,
                 setError,
             )
         }
     }
-
     return (
         <form
             onSubmit={handleSubmit(
                 onFormSubmit,
             )}
-            className="flex flex-col gap-4 border border-zinc-700 rounded-xl p-4 bg-[#d2d2ca8c]"
+            className="flex flex-col gap-4 border border-zinc-200 rounded-xl p-4 bg-white shadow-sm"
         >
             <AddressLabelSelector
                 label={label}
@@ -93,12 +87,10 @@ export const AddressForm = ({
                     )
                 }
             />
-
             <AddressFormFields
                 form={form}
                 isLoading={isLoading}
             />
-
             <label className="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer">
                 <input
                     type="checkbox"
@@ -107,16 +99,13 @@ export const AddressForm = ({
                         'isDefault',
                     )}
                 />
-
                 Set as default address
             </label>
-
             {errors.root && (
                 <p className="text-sm text-red-500">
                     {errors.root.message}
                 </p>
             )}
-
             <div className="flex gap-3">
                 <Button
                     type="submit"
@@ -128,7 +117,6 @@ export const AddressForm = ({
                         ? 'Saving...'
                         : submitLabel}
                 </Button>
-
                 <Button
                     type="button"
                     variant="text"

@@ -1,5 +1,3 @@
-
-
 import type { UserAddress } from '../../api/addressesApi'
 import { AddressCardActions } from './AddressCardActions'
 
@@ -10,7 +8,6 @@ interface AddressCardProps {
     onSetDefault: (id: string) => void
     isDeleting: boolean
 }
-
 export const AddressCard = ({
     address,
     onEdit,
@@ -19,16 +16,13 @@ export const AddressCard = ({
     isDeleting,
 }: AddressCardProps) => {
     const containerClass = address.isDefault
-        ? 'border-zinc-800 bg-zinc-200/60'
-        : 'border-zinc-300 bg-transparent'
-
+        ? 'border-emerald-600 bg-emerald-50 shadow-sm'
+        : 'border-zinc-200 bg-white'
     const fullStreet = `${address.street}, ${address.number}${address.complement
         ? `, ${address.complement}`
         : ''
         }`
-
     const cityLine = `${address.district} — ${address.city}, ${address.state}`
-
     return (
         <div
             className={`relative border rounded-xl p-4 flex flex-col gap-1 transition-colors ${containerClass}`}
@@ -40,14 +34,12 @@ export const AddressCard = ({
                             {address.label}
                         </span>
                     )}
-
                     {address.isDefault && (
-                        <span className="text-xs font-semibold uppercase tracking-wide text-zinc-800 bg-zinc-200 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
                             Default
                         </span>
                     )}
                 </div>
-
                 <AddressCardActions
                     address={address}
                     onEdit={onEdit}
@@ -56,23 +48,18 @@ export const AddressCard = ({
                     isDeleting={isDeleting}
                 />
             </div>
-
             <p className="font-medium text-zinc-900 text-sm">
                 {address.recipientName}
             </p>
-
             <p className="text-sm text-zinc-700">
                 {fullStreet}
             </p>
-
             <p className="text-sm text-zinc-700">
                 {cityLine}
             </p>
-
             <p className="text-sm text-zinc-700">
                 {address.zipCode}
             </p>
-
             {address.phoneNumber && (
                 <p className="text-sm text-zinc-700 mt-1">
                     {address.phoneNumber}

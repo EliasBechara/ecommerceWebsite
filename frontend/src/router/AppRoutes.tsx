@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-
 import { Home } from "../pages/Home";
 import { LoginPage } from "../features/auth/pages/LoginPage";
 import { RegisterPage } from "../features/auth/pages/RegisterPage";
@@ -10,7 +9,7 @@ import { PaymentPage } from "../features/payment/pages/PaymentPage";
 import { ProtectedRoute } from "../components/routes/ProtectedRoute";
 import { AccountSettingsPage } from "../features/account/pages/AccountSettingsPage";
 import { OrderDetailsPage } from "../features/order/pages/OrderDetails";
-import { PaymentSuccessPage } from "../features/order/pages/OrderSucess";
+import { PaymentSuccessPage } from "../features/payment/pages/PaymentSuccess";
 import { PrivacyPolicy } from "../pages/PrivacyPolicy";
 import { ReturnsAndRefunds } from "../pages/ReturnsAndRefunds";
 import { TermsAndConditions } from "../pages/TermsAndConditions";
