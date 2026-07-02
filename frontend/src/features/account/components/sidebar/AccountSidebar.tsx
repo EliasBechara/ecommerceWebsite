@@ -1,29 +1,18 @@
 import { Button } from "../../../../components/button/Button";
+import { ACCOUNT_TABS, type AccountTabId } from "../../utils/tabs";
+
 
 interface AccountSidebarProps {
-    activeTab: string;
-    setActiveTab: (tab: string) => void;
+    activeTab: AccountTabId;
+    setActiveTab: (tab: AccountTabId) => void;
 }
 
-export const AccountSidebar = ({
-    activeTab,
-    setActiveTab,
-}: AccountSidebarProps) => {
-    const tabs = [
-        { id: "profile", label: "Profile Details" },
-        { id: "orders", label: "Order History" },
-        { id: "addresses", label: "Addresses" },
-        { id: "security", label: "Security" },
-        { id: "logout", label: "Logout" },
-    ];
-
+export const AccountSidebar = ({ activeTab, setActiveTab }: AccountSidebarProps) => {
     return (
         <>
-            {/* Mobile Navigation */}
             <nav className="flex gap-3 overflow-x-auto pb-2 md:hidden">
-                {tabs.map((tab) => {
+                {ACCOUNT_TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
-
                     return (
                         <Button
                             key={tab.id}
@@ -40,12 +29,9 @@ export const AccountSidebar = ({
                     );
                 })}
             </nav>
-
-            {/* Desktop Navigation */}
             <nav className="hidden md:flex md:flex-col md:gap-4 md:border-r md:border-zinc-400 md:pr-4">
-                {tabs.map((tab) => {
+                {ACCOUNT_TABS.map((tab) => {
                     const isActive = activeTab === tab.id;
-
                     return (
                         <Button
                             key={tab.id}

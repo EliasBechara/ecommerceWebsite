@@ -1,44 +1,14 @@
 import { useState } from "react";
 import { PageLayout } from "../../../components/layout/PageLayout";
 import { AccountSidebar } from "../components/sidebar/AccountSidebar";
-import { ProfileDetails } from "../components/profile/ProfileDetails";
-import { UserAddresses } from "../../addresses/components/UserAddresses";
-import { UserSecurityDetails } from "../components/profile/UserSecurityDetails";
-import { UserOrderHistory } from "../../order/components/UserOrderHistory";
-import { LogoutUser } from "../components/profile/LogoutUser";
+import { ACCOUNT_TABS, type AccountTabId } from "../utils/tabs";
+
 
 export const AccountSettingsPage = () => {
-    const [activeTab, setActiveTab] = useState("profile");
+    const [activeTab, setActiveTab] = useState<AccountTabId>("profile");
 
-    const tabs = [
-        { id: "profile", label: "Profile" },
-        { id: "addresses", label: "Addresses" },
-        { id: "security", label: "Security" },
-        { id: "orders", label: "Orders" },
-        { id: "logout", label: "Logout" },
-    ];
-
-    const renderTabContent = () => {
-        switch (activeTab) {
-            case "profile":
-                return <ProfileDetails />;
-
-            case "addresses":
-                return <UserAddresses />;
-
-            case "security":
-                return <UserSecurityDetails />;
-
-            case "orders":
-                return <UserOrderHistory />;
-
-            case "logout":
-                return <LogoutUser />;
-
-            default:
-                return null;
-        }
-    };
+    const ActiveComponent =
+        ACCOUNT_TABS.find((tab) => tab.id === activeTab)?.component ?? null;
 
     return (
         <PageLayout>
@@ -50,9 +20,8 @@ export const AccountSettingsPage = () => {
                             setActiveTab={setActiveTab}
                         />
                     </aside>
-
                     <main className="w-full md:w-3/4">
-                        {renderTabContent()}
+                        {ActiveComponent && <ActiveComponent />}
                     </main>
                 </div>
             </div>

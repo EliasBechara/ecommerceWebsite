@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useController } from 'react-hook-form';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ProfileDetailsForm } from './ProfileDetailsForm';
 
 

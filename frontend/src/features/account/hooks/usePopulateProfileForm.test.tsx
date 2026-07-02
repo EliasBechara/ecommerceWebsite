@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { usePopulateProfileForm } from './usePopulateProfileForm';
 import type { UserProfile } from '../api/accountApi';
 
